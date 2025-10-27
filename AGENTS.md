@@ -1,4 +1,4 @@
-# Agent Guidelines for Charger Extension
+# Agent Guidelines for WebKey Extension
 
 ## Commands
 - **Build**: `pnpm build` (Chrome) or `pnpm build:firefox`

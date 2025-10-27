@@ -4,12 +4,12 @@ import { defineConfig } from "wxt";
 export default defineConfig({
   modules: ["@wxt-dev/module-react"],
   manifest: {
-    name: "Charger - Productivity Shortcuts",
+    name: "WebKey - Productivity Shortcuts",
     description:
       "Multi-website browser extension with custom keyboard shortcuts and productivity enhancements for Gmail, Platzi, Notion, and more.",
     version: "1.0.0",
     author: { email: "acbc.dev@gmail.com" },
-    homepage_url: "https://github.com/acbcdev/changer",
+    homepage_url: "https://github.com/acbcdev/webkey",
     permissions: ["clipboardWrite"],
     icons: {
       16: "/icon/16.png",
