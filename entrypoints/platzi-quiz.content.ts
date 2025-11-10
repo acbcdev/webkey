@@ -1,7 +1,7 @@
 import hotkeys from "hotkeys-js";
 
 export default defineContentScript({
-  matches: ["*://*.platzi.com/clases/examen/*"],
+  matches: ["*://*.platzi.com/clases/examen/*","*://*.platzi.com/clases/quiz/*"],
   main() {
     // Track currently selected quiz option index
     console.log("Platzi: Quiz content script loaded quiz");
