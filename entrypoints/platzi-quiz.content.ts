@@ -1,34 +1,14 @@
 import hotkeys from "hotkeys-js";
 
 export default defineContentScript({
-  matches: ["*://*.platzi.com/clases/examen/*","*://*.platzi.com/clases/quiz/*"],
+  matches: [
+    "*://*.platzi.com/clases/examen/*",
+    "*://*.platzi.com/clases/quiz/*",
+  ],
   main() {
     // Track currently selected quiz option index
     console.log("Platzi: Quiz content script loaded quiz");
     let selectedOptionIndex = -1;
-
-    // Helper function to copy and provide visual feedback
-    function copyToClipboard(element: HTMLElement) {
-      const textToCopy = element.innerText || element.textContent;
-
-      if (textToCopy) {
-        navigator.clipboard
-          .writeText(textToCopy.trim())
-          .then(() => {
-            // Visual feedback - briefly highlight the element
-            const originalBackground = element.style.backgroundColor;
-            element.style.backgroundColor = "#4CAF50";
-            element.style.transition = "background-color 0.3s";
-
-            setTimeout(() => {
-              element.style.backgroundColor = originalBackground;
-            }, 300);
-          })
-          .catch((err) => {
-            console.error("Failed to copy to clipboard:", err);
-          });
-      }
-    }
 
     // Helper function to highlight selected quiz option
     function highlightOption(index: number) {
@@ -51,20 +31,35 @@ export default defineContentScript({
       }
     }
 
-    // Double-click event listener for content class
-    document.addEventListener("dblclick", (event) => {
-      const target = event.target as HTMLElement;
-
-      // Check if the clicked element or its parent has a class containing "Articlass__content"
-      // This is more resilient to CSS Module hash changes
-      const contentElement = target.closest(
-        '[class*="Articlass__content"]'
-      ) as HTMLElement;
-
-      if (contentElement) {
-        copyToClipboard(contentElement);
+    // Helper function to click control buttons in sequence
+    function clickControlButton() {
+      const nextButton = document.querySelector(
+        'button[testid="ControlBar-button-next"]'
+      ) as HTMLButtonElement;
+      if (nextButton) {
+        nextButton.click();
+        console.log("Platzi: Clicked Next button");
+        return;
       }
-    });
+
+      const startButton = document.querySelector(
+        'button[data-trans="StartExam.cta.takeTest"]'
+      ) as HTMLButtonElement;
+      if (startButton) {
+        startButton.click();
+        console.log("Platzi: Clicked Start button");
+        return;
+      }
+
+      const finishButton = document.querySelector(
+        'button[testid="ControlBar-button-finish"]'
+      ) as HTMLButtonElement;
+      if (finishButton) {
+        finishButton.click();
+        console.log("Platzi: Clicked Finish button");
+        return;
+      }
+    }
 
     // Arrow key navigation for quiz options
     hotkeys("down", () => {
@@ -103,7 +98,7 @@ export default defineContentScript({
       console.log(`Platzi: Navigated to option ${selectedOptionIndex}`);
     });
 
-    // Enter key to click the highlighted option or the Next button
+    // Enter key to click the highlighted option or control buttons
     hotkeys("enter", () => {
       const optionButtons = document.querySelectorAll(
         'button[data-testid="QuestionOption-content"]'
@@ -119,21 +114,22 @@ export default defineContentScript({
         // Reset selection after clicking
         selectedOptionIndex = -1;
         highlightOption(-1);
-      } else {
-        // If no option is highlighted, click the "Siguiente" (Next) button
-        const nextButton = document.querySelector(
-          'button[testid="ControlBar-button-next"]'
-        ) as HTMLButtonElement;
-
-        if (nextButton) {
-          nextButton.click();
-          console.log("Platzi: Clicked Next button");
-        }
+        return;
       }
+
+      // Try clicking control buttons in order
+      clickControlButton();
     });
 
-    // Press 'a', 'b', 'c', or 'd' to select quiz options
-    hotkeys("a,b,c,d", (event) => {
+    // Press ESC to cancel option selection
+    hotkeys("esc", () => {
+      selectedOptionIndex = -1;
+      highlightOption(-1);
+      console.log("Platzi: Cancelled option selection");
+    });
+
+    // Press 'a', 'b', 'c', 'd', or 'e' to select quiz options by letter
+    hotkeys("a,b,c,d,e", (event) => {
       const optionButtons = document.querySelectorAll(
         'button[data-testid="QuestionOption-content"]'
       ) as NodeListOf<HTMLButtonElement>;
@@ -154,6 +150,28 @@ export default defineContentScript({
           highlightOption(-1);
           break;
         }
+      }
+    });
+
+    // Press 1-5 to select quiz options by position
+    hotkeys("1,2,3,4,5", (event) => {
+      const optionButtons = document.querySelectorAll(
+        'button[data-testid="QuestionOption-content"]'
+      ) as NodeListOf<HTMLButtonElement>;
+
+      if (optionButtons.length === 0) return;
+
+      // Convert key to 0-based index (1→0, 2→1, etc)
+      const index = parseInt(event.key) - 1;
+
+      if (index >= 0 && index < optionButtons.length) {
+        optionButtons[index].click();
+        console.log(
+          `Platzi: Selected option ${event.key} (${String.fromCharCode(65 + index)})`
+        );
+        // Reset selection after clicking
+        selectedOptionIndex = -1;
+        highlightOption(-1);
       }
     });
   },
