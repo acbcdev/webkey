@@ -83,3 +83,4 @@ const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
 **User Feedback**: Provide visual confirmation (color flash, console logs) for actions like clipboard copy
 
 **Event Delegation**: Use document-level listeners with element matching for dynamic content
+- for the shorcuts we are using hotkeys-js
