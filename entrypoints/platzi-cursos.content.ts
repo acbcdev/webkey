@@ -1,4 +1,5 @@
 import hotkeys from "hotkeys-js";
+import { $ } from "@/lib/query";
 
 export default defineContentScript({
   matches: ["*://*.platzi.com/cursos/*"],
@@ -47,7 +48,7 @@ export default defineContentScript({
 
     // Press 'h' to copy the first h1 element
     hotkeys("h", () => {
-      const h1Element = document.querySelector("h1") as HTMLElement;
+      const h1Element = $<HTMLElement>("h1");
       if (h1Element) {
         copyToClipboard(h1Element);
       }
@@ -55,9 +56,7 @@ export default defineContentScript({
 
     // Press 'r' to copy the resume content
     hotkeys("r", () => {
-      const contentElement = document.querySelector(
-        '[class*="Articlass__content"]'
-      ) as HTMLElement;
+      const contentElement = $<HTMLElement>('[class*="Articlass__content"]');
       console.log(contentElement);
       if (contentElement) {
         copyToClipboard(contentElement);

@@ -1,80 +1,93 @@
-import hotkeys from 'hotkeys-js';
+import hotkeys from "hotkeys-js";
+import { $ } from "@/lib/query";
 
 export default defineContentScript({
   matches: ["*://mail.google.com/*"],
   main() {
     // Left arrow or '<' for newer email
-    hotkeys('left, <', () => {
-      const newerButton = document.querySelector(
+    hotkeys("left, <", () => {
+      const newerButton = $<HTMLElement>(
         '[aria-label="Newer"], [aria-label="Más reciente"]'
-      ) as HTMLElement;
+      );
       if (newerButton && newerButton.getAttribute("aria-disabled") !== "true") {
         newerButton.click();
       }
     });
 
     // Right arrow or '>' for older email
-    hotkeys('right, >', () => {
-      const olderButton = document.querySelector(
+    hotkeys("right, >", () => {
+      const olderButton = $<HTMLElement>(
         '[aria-label="Older"], [aria-label="Anterior"]'
-      ) as HTMLElement;
+      );
       if (olderButton && olderButton.getAttribute("aria-disabled") !== "true") {
         olderButton.click();
       }
     });
 
-    // Account switching: Ctrl+Cmd+number (Mac) or Ctrl+Alt+number (Windows/Linux)
+    // Account switching: Cmd+Shift+number (Mac) or Ctrl+Shift+number (Windows/Linux)
     const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
-    const modifier = isMac ? 'ctrl+command' : 'ctrl+alt';
-
-    hotkeys(`${modifier}+1,${modifier}+2,${modifier}+3,${modifier}+4,${modifier}+5,${modifier}+6,${modifier}+7,${modifier}+8,${modifier}+9`, (event) => {
-      const numberPressed = parseInt(event.key);
+    // const modifier = isMac ? "" : "ctrl+shift";
+    // `${modifier}+1,${modifier}+2,${modifier}+3,${modifier}+4,${modifier}+5,${modifier}+6,${modifier}+7,${modifier}+8,${modifier}+9`
+    const keys = "1,2,3,4,5,6,7,8,9";
+    hotkeys(keys, (event) => {
+      const numberPressed = parseInt(event.key, 10);
       if (numberPressed >= 1 && numberPressed <= 9) {
         switchToAccount(numberPressed - 1);
       }
     });
 
     // Open account switcher menu: Cmd+Shift+A (Mac) or Alt+A/Ctrl+Shift+A (Windows/Linux)
-    const menuShortcut = isMac ? 'command+shift+a' : 'alt+a,ctrl+shift+a';
+    const menuShortcut = isMac ? "command+shift+a" : "alt+a,ctrl+shift+a";
     hotkeys(menuShortcut, () => {
       openAccountSwitcher();
     });
 
-    // Press 'h' to go to inbox
-    hotkeys('h', () => {
+    // Press '0' to go to inbox
+    hotkeys("0", () => {
       goToInbox();
     });
-
+    // Press Enter to click the back/send button (e.g., in conversation or compose view)
+    hotkeys("enter", () => {
+      const mailRow = $<HTMLElement>(".btb");
+      if (mailRow) {
+        try {
+          mailRow.click();
+          console.log("Gmail: Clicked back/send button via Enter key");
+        } catch (error) {
+          console.error("Gmail: Failed to click back/send button:", error);
+        }
+      }
+    });
     // Function to open the account switcher menu
     function openAccountSwitcher() {
       // Click on the profile picture/account button
-      const profileButton = document.querySelector(
-        'a[aria-label*="Google Account"]'
-      ) as HTMLElement;
+      const profileButton = $<HTMLElement>('a[aria-label*="Google Account"]');
 
       if (profileButton) {
         profileButton.click();
       } else {
         // Try alternative selectors
-        const altButton = document
-          .querySelector('[aria-label="Google apps"]')
-          ?.parentElement?.querySelector(
-            'a[href*="accounts.google.com"]'
-          ) as HTMLElement;
+        const googleAppsButton = $<HTMLElement>('[aria-label="Google apps"]');
+        if (googleAppsButton?.parentElement) {
+          const altButton = $<HTMLElement>(
+            'a[href*="accounts.google.com"]',
+            googleAppsButton.parentElement
+          );
 
-        if (altButton) {
-          altButton.click();
+          if (altButton) {
+            altButton.click();
+          }
         }
       }
     }
 
     // Function to switch to a specific account by index via URL modification
     function switchToAccount(index: number) {
-      const currentUrl = window.location.href;
+      // const currentUrl = window.location.href;
 
-      // Extract current account number if exists
-      const accountMatch = currentUrl.match(/\/mail\/u\/(\d+)\//);
-      const currentAccount = accountMatch ? accountMatch[1] : "0";
+      // // Extract current account number if exists
+      // const accountMatch = currentUrl.match(/\/mail\/u\/(\d+)\//);
+      // const currentAccount = accountMatch ? accountMatch[1] : "0";
 
       // Build new URL - always go to inbox when switching accounts
       const newUrl = `https://mail.google.com/mail/u/${index}/#inbox`;
@@ -85,13 +98,13 @@ export default defineContentScript({
     // Function to go to inbox
     function goToInbox() {
       // Try to find the inbox button in the sidebar (supports English and Spanish)
-      const inboxButton = document.querySelector(
+      const inboxButton = $<HTMLElement>(
         '[data-tooltip="Inbox"], [data-tooltip="Recibidos"]'
-      ) as HTMLElement;
+      );
 
       if (inboxButton) {
         // Find the link inside the inbox button
-        const inboxLink = inboxButton.querySelector("a") as HTMLElement;
+        const inboxLink = $<HTMLElement>("a", inboxButton);
         if (inboxLink) {
           inboxLink.click();
           console.log("Gmail: Clicked inbox button");

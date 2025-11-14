@@ -1,4 +1,5 @@
 import hotkeys from "hotkeys-js";
+import { $, $$ } from "@/lib/query";
 
 export default defineContentScript({
   matches: [
@@ -12,9 +13,9 @@ export default defineContentScript({
 
     // Helper function to highlight selected quiz option
     function highlightOption(index: number) {
-      const optionButtons = document.querySelectorAll(
+      const optionButtons = $$<HTMLButtonElement>(
         'button[data-testid="QuestionOption-content"]'
-      ) as NodeListOf<HTMLButtonElement>;
+      );
 
       // Remove previous highlights
       optionButtons.forEach((btn) => {
@@ -33,39 +34,62 @@ export default defineContentScript({
 
     // Helper function to click control buttons in sequence
     function clickControlButton() {
-      const nextButton = document.querySelector(
-        'button[testid="ControlBar-button-next"]'
-      ) as HTMLButtonElement;
-      if (nextButton) {
-        nextButton.click();
-        console.log("Platzi: Clicked Next button");
-        return;
+      // Try to get the last button in ControlBar (most efficient)
+      const controlBar = $<HTMLElement>(".ControlBar-content");
+      if (controlBar) {
+        const buttons = $$<HTMLButtonElement>("button:not([disabled])");
+        if (buttons.length > 0) {
+          const lastButton = buttons[buttons.length - 1];
+          lastButton.click();
+          console.log("Platzi: Clicked last enabled ControlBar button");
+          return;
+        }
       }
 
-      const startButton = document.querySelector(
+      const startButton = $<HTMLButtonElement>(
         'button[data-trans="StartExam.cta.takeTest"]'
-      ) as HTMLButtonElement;
+      );
       if (startButton) {
         startButton.click();
         console.log("Platzi: Clicked Start button");
         return;
       }
 
-      const finishButton = document.querySelector(
+      const presentarButton = $<HTMLButtonElement>(
+        'button[maintext="StartQuiz.cta.takeTest"]'
+      );
+      if (presentarButton) {
+        presentarButton.click();
+        console.log("Platzi: Clicked Presentar quiz button");
+        return;
+      }
+
+      const finishButton = $<HTMLButtonElement>(
         'button[testid="ControlBar-button-finish"]'
-      ) as HTMLButtonElement;
+      );
       if (finishButton) {
         finishButton.click();
         console.log("Platzi: Clicked Finish button");
+        return;
+      }
+
+      const continueButton = $<HTMLAnchorElement>(
+        'a[data-testid="ResultsOverview-btns-cta"]'
+      );
+      if (continueButton) {
+        continueButton.click();
+        console.log(
+          "Platzi: Clicked Continuar aprendiendo (Continue learning) button"
+        );
         return;
       }
     }
 
     // Arrow key navigation for quiz options
     hotkeys("down", () => {
-      const optionButtons = document.querySelectorAll(
+      const optionButtons = $$<HTMLButtonElement>(
         'button[data-testid="QuestionOption-content"]'
-      ) as NodeListOf<HTMLButtonElement>;
+      );
 
       if (optionButtons.length === 0) return;
 
@@ -80,9 +104,9 @@ export default defineContentScript({
     });
 
     hotkeys("up", () => {
-      const optionButtons = document.querySelectorAll(
+      const optionButtons = $$<HTMLButtonElement>(
         'button[data-testid="QuestionOption-content"]'
-      ) as NodeListOf<HTMLButtonElement>;
+      );
 
       if (optionButtons.length === 0) return;
 
@@ -100,9 +124,9 @@ export default defineContentScript({
 
     // Enter key to click the highlighted option or control buttons
     hotkeys("enter", () => {
-      const optionButtons = document.querySelectorAll(
+      const optionButtons = $$<HTMLButtonElement>(
         'button[data-testid="QuestionOption-content"]'
-      ) as NodeListOf<HTMLButtonElement>;
+      );
 
       // If an option is highlighted, click it
       if (
@@ -130,17 +154,15 @@ export default defineContentScript({
 
     // Press 'a', 'b', 'c', 'd', or 'e' to select quiz options by letter
     hotkeys("a,b,c,d,e", (event) => {
-      const optionButtons = document.querySelectorAll(
+      const optionButtons = $$<HTMLButtonElement>(
         'button[data-testid="QuestionOption-content"]'
-      ) as NodeListOf<HTMLButtonElement>;
+      );
 
       if (optionButtons.length === 0) return;
 
       // Find the button with the matching letter
       for (const button of optionButtons) {
-        const letterSpan = button.querySelector(
-          ".QuestionOption-letter-span"
-        ) as HTMLElement;
+        const letterSpan = $(".QuestionOption-letter-span", button);
 
         if (letterSpan && letterSpan.textContent?.toLowerCase() === event.key) {
           button.click();
@@ -155,19 +177,21 @@ export default defineContentScript({
 
     // Press 1-5 to select quiz options by position
     hotkeys("1,2,3,4,5", (event) => {
-      const optionButtons = document.querySelectorAll(
+      const optionButtons = $$<HTMLButtonElement>(
         'button[data-testid="QuestionOption-content"]'
-      ) as NodeListOf<HTMLButtonElement>;
+      );
 
       if (optionButtons.length === 0) return;
 
       // Convert key to 0-based index (1→0, 2→1, etc)
-      const index = parseInt(event.key) - 1;
+      const index = Number(event.key) - 1;
 
       if (index >= 0 && index < optionButtons.length) {
         optionButtons[index].click();
         console.log(
-          `Platzi: Selected option ${event.key} (${String.fromCharCode(65 + index)})`
+          `Platzi: Selected option ${event.key} (${String.fromCharCode(
+            65 + index
+          )})`
         );
         // Reset selection after clicking
         selectedOptionIndex = -1;
