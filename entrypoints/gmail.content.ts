@@ -24,8 +24,6 @@ export default defineContentScript({
       }
     });
 
-    // Account switching: Cmd+Shift+number (Mac) or Ctrl+Shift+number (Windows/Linux)
-    const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
     // const modifier = isMac ? "" : "ctrl+shift";
     // `${modifier}+1,${modifier}+2,${modifier}+3,${modifier}+4,${modifier}+5,${modifier}+6,${modifier}+7,${modifier}+8,${modifier}+9`
     const keys = "1,2,3,4,5,6,7,8,9";
@@ -34,12 +32,6 @@ export default defineContentScript({
       if (numberPressed >= 1 && numberPressed <= 9) {
         switchToAccount(numberPressed - 1);
       }
-    });
-
-    // Open account switcher menu: Cmd+Shift+A (Mac) or Alt+A/Ctrl+Shift+A (Windows/Linux)
-    const menuShortcut = isMac ? "command+shift+a" : "alt+a,ctrl+shift+a";
-    hotkeys(menuShortcut, () => {
-      openAccountSwitcher();
     });
 
     // Press '0' to go to inbox
@@ -58,40 +50,11 @@ export default defineContentScript({
         }
       }
     });
-    // Function to open the account switcher menu
-    function openAccountSwitcher() {
-      // Click on the profile picture/account button
-      const profileButton = $<HTMLElement>('a[aria-label*="Google Account"]');
-
-      if (profileButton) {
-        profileButton.click();
-      } else {
-        // Try alternative selectors
-        const googleAppsButton = $<HTMLElement>('[aria-label="Google apps"]');
-        if (googleAppsButton?.parentElement) {
-          const altButton = $<HTMLElement>(
-            'a[href*="accounts.google.com"]',
-            googleAppsButton.parentElement
-          );
-
-          if (altButton) {
-            altButton.click();
-          }
-        }
-      }
-    }
 
     // Function to switch to a specific account by index via URL modification
     function switchToAccount(index: number) {
-      // const currentUrl = window.location.href;
-
-      // // Extract current account number if exists
-      // const accountMatch = currentUrl.match(/\/mail\/u\/(\d+)\//);
-      // const currentAccount = accountMatch ? accountMatch[1] : "0";
-
       // Build new URL - always go to inbox when switching accounts
       const newUrl = `https://mail.google.com/mail/u/${index}/#inbox`;
-
       window.location.href = newUrl;
     }
 
