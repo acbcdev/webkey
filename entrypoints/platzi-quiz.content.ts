@@ -1,5 +1,92 @@
 import hotkeys from "hotkeys-js";
+import {
+  clickLastControlBarButton,
+  findAndClickButton,
+} from "@/lib/button-finder";
+import { SELECTORS, SHORTCUTS } from "@/lib/constants";
 import { $, $$ } from "@/lib/query";
+import { clearOutline, highlightElement } from "@/lib/visual-feedback";
+
+/**
+ * Manages quiz option navigation state and highlighting via arrow keys
+ * Handles up/down navigation, clicking selected option, and cancellation
+ */
+class QuizNavigator {
+  private selectedIndex: number = -1;
+
+  next(): void {
+    const optionButtons = $$<HTMLButtonElement>(
+      SELECTORS.PLATZI_QUIZ.QUIZ_OPTIONS
+    );
+
+    if (optionButtons.length === 0) return;
+
+    if (this.selectedIndex === -1) {
+      this.selectedIndex = 0;
+    } else {
+      this.selectedIndex = (this.selectedIndex + 1) % optionButtons.length;
+    }
+
+    this.updateHighlight(optionButtons);
+    console.log(`Platzi: Navigated to option ${this.selectedIndex}`);
+  }
+
+  previous(): void {
+    const optionButtons = $$<HTMLButtonElement>(
+      SELECTORS.PLATZI_QUIZ.QUIZ_OPTIONS
+    );
+
+    if (optionButtons.length === 0) return;
+
+    if (this.selectedIndex === -1) {
+      this.selectedIndex = optionButtons.length - 1;
+    } else {
+      this.selectedIndex =
+        (this.selectedIndex - 1 + optionButtons.length) % optionButtons.length;
+    }
+
+    this.updateHighlight(optionButtons);
+    console.log(`Platzi: Navigated to option ${this.selectedIndex}`);
+  }
+
+  clickCurrent(): boolean {
+    const optionButtons = $$<HTMLButtonElement>(
+      SELECTORS.PLATZI_QUIZ.QUIZ_OPTIONS
+    );
+
+    if (this.selectedIndex >= 0 && this.selectedIndex < optionButtons.length) {
+      optionButtons[this.selectedIndex].click();
+      console.log(`Platzi: Clicked option ${this.selectedIndex}`);
+      this.cancel();
+      return true;
+    }
+
+    return false;
+  }
+
+  hasSelection(): boolean {
+    return this.selectedIndex >= 0;
+  }
+
+  cancel(): void {
+    this.selectedIndex = -1;
+    const optionButtons = $$<HTMLButtonElement>(
+      SELECTORS.PLATZI_QUIZ.QUIZ_OPTIONS
+    );
+    optionButtons.forEach((btn) => {
+      clearOutline(btn);
+    });
+    console.log("Platzi: Cancelled option selection");
+  }
+
+  private updateHighlight(optionButtons: NodeListOf<HTMLButtonElement>): void {
+    if (this.selectedIndex >= 0 && this.selectedIndex < optionButtons.length) {
+      const selectedButton = optionButtons[this.selectedIndex];
+      highlightElement(selectedButton, optionButtons);
+      selectedButton.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }
+}
 
 export default defineContentScript({
   matches: [
@@ -7,183 +94,66 @@ export default defineContentScript({
     "*://*.platzi.com/clases/quiz/*",
   ],
   main() {
-    // Track currently selected quiz option index
-    console.log("Platzi: Quiz content script loaded quiz");
-    let selectedOptionIndex = -1;
-
-    // Helper function to highlight selected quiz option
-    function highlightOption(index: number) {
-      const optionButtons = $$<HTMLButtonElement>(
-        'button[data-testid="QuestionOption-content"]'
-      );
-
-      // Remove previous highlights
-      optionButtons.forEach((btn) => {
-        btn.style.outline = "";
-        btn.style.outlineOffset = "";
-      });
-
-      // Highlight the selected option
-      if (index >= 0 && index < optionButtons.length) {
-        const selectedButton = optionButtons[index];
-        selectedButton.style.outline = "3px solid #4CAF50";
-        selectedButton.style.outlineOffset = "2px";
-        selectedButton.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      }
-    }
-
-    // Helper function to click control buttons in sequence
-    function clickControlButton() {
-      // Try to get the last button in ControlBar (most efficient)
-      const controlBar = $<HTMLElement>(".ControlBar-content");
-      if (controlBar) {
-        const buttons = $$<HTMLButtonElement>("button:not([disabled])");
-        if (buttons.length > 0) {
-          const lastButton = buttons[buttons.length - 1];
-          lastButton.click();
-          console.log("Platzi: Clicked last enabled ControlBar button");
-          return;
-        }
-      }
-
-      const startButton = $<HTMLButtonElement>(
-        'button[data-trans="StartExam.cta.takeTest"]'
-      );
-      if (startButton) {
-        startButton.click();
-        console.log("Platzi: Clicked Start button");
-        return;
-      }
-
-      const presentarButton = $<HTMLButtonElement>(
-        'button[maintext="StartQuiz.cta.takeTest"]'
-      );
-      if (presentarButton) {
-        presentarButton.click();
-        console.log("Platzi: Clicked Presentar quiz button");
-        return;
-      }
-
-      const finishButton = $<HTMLButtonElement>(
-        'button[testid="ControlBar-button-finish"]'
-      );
-      if (finishButton) {
-        finishButton.click();
-        console.log("Platzi: Clicked Finish button");
-        return;
-      }
-
-      const continueButton = $<HTMLAnchorElement>(
-        'a[data-testid="ResultsOverview-btns-cta"]'
-      );
-      if (continueButton) {
-        continueButton.click();
-        console.log(
-          "Platzi: Clicked Continuar aprendiendo (Continue learning) button"
-        );
-        return;
-      }
-    }
+    console.log("Platzi: Quiz content script loaded");
+    const navigator = new QuizNavigator();
 
     // Arrow key navigation for quiz options
-    hotkeys("down", () => {
-      const optionButtons = $$<HTMLButtonElement>(
-        'button[data-testid="QuestionOption-content"]'
-      );
-
-      if (optionButtons.length === 0) return;
-
-      if (selectedOptionIndex === -1) {
-        selectedOptionIndex = 0;
-      } else {
-        selectedOptionIndex = (selectedOptionIndex + 1) % optionButtons.length;
-      }
-
-      highlightOption(selectedOptionIndex);
-      console.log(`Platzi: Navigated to option ${selectedOptionIndex}`);
+    hotkeys(SHORTCUTS.PLATZI_QUIZ.NEXT_OPTION, () => {
+      navigator.next();
     });
 
-    hotkeys("up", () => {
-      const optionButtons = $$<HTMLButtonElement>(
-        'button[data-testid="QuestionOption-content"]'
-      );
-
-      if (optionButtons.length === 0) return;
-
-      if (selectedOptionIndex === -1) {
-        selectedOptionIndex = optionButtons.length - 1;
-      } else {
-        selectedOptionIndex =
-          (selectedOptionIndex - 1 + optionButtons.length) %
-          optionButtons.length;
-      }
-
-      highlightOption(selectedOptionIndex);
-      console.log(`Platzi: Navigated to option ${selectedOptionIndex}`);
+    hotkeys(SHORTCUTS.PLATZI_QUIZ.PREVIOUS_OPTION, () => {
+      navigator.previous();
     });
 
     // Enter key to click the highlighted option or control buttons
-    hotkeys("enter", () => {
-      const optionButtons = $$<HTMLButtonElement>(
-        'button[data-testid="QuestionOption-content"]'
-      );
-
-      // If an option is highlighted, click it
-      if (
-        selectedOptionIndex >= 0 &&
-        selectedOptionIndex < optionButtons.length
-      ) {
-        optionButtons[selectedOptionIndex].click();
-        console.log(`Platzi: Clicked option ${selectedOptionIndex}`);
-        // Reset selection after clicking
-        selectedOptionIndex = -1;
-        highlightOption(-1);
+    hotkeys(SHORTCUTS.PLATZI_QUIZ.SELECT_OPTION, () => {
+      // If an option is highlighted via arrow keys, click it
+      if (navigator.clickCurrent()) {
         return;
       }
 
-      // Try clicking control buttons in order
-      clickControlButton();
+      // Try clicking control buttons - check ControlBar first, then other buttons
+      const clicked = clickLastControlBarButton() || !!findAndClickButton();
+      if (!clicked) {
+        console.warn("Platzi: No button found to click");
+      }
     });
 
     // Press ESC to cancel option selection
-    hotkeys("esc", () => {
-      selectedOptionIndex = -1;
-      highlightOption(-1);
-      console.log("Platzi: Cancelled option selection");
+    hotkeys(SHORTCUTS.PLATZI_QUIZ.CANCEL_SELECTION, () => {
+      navigator.cancel();
     });
 
-    // Press 'a', 'b', 'c', 'd', or 'e' to select quiz options by letter
-    hotkeys("a,b,c,d,e", (event) => {
+    // Press 'a', 'b', 'c', 'd', or 'e' to select quiz options by letter (direct selection)
+    hotkeys(SHORTCUTS.PLATZI_QUIZ.SELECT_BY_LETTER, (event) => {
       const optionButtons = $$<HTMLButtonElement>(
-        'button[data-testid="QuestionOption-content"]'
+        SELECTORS.PLATZI_QUIZ.QUIZ_OPTIONS
       );
 
       if (optionButtons.length === 0) return;
 
-      // Find the button with the matching letter
+      // Find the button with the matching letter and click it directly
       for (const button of optionButtons) {
-        const letterSpan = $(".QuestionOption-letter-span", button);
+        const letterSpan = $(SELECTORS.PLATZI_QUIZ.OPTION_LETTER, button);
 
         if (letterSpan && letterSpan.textContent?.toLowerCase() === event.key) {
           button.click();
           console.log(`Platzi: Selected option ${event.key.toUpperCase()}`);
-          // Reset selection after clicking
-          selectedOptionIndex = -1;
-          highlightOption(-1);
+          navigator.cancel(); // Clear any previous arrow key selection
           break;
         }
       }
     });
 
-    // Press 1-5 to select quiz options by position
-    hotkeys("1,2,3,4,5", (event) => {
+    // Press 1-5 to select quiz options by position (direct selection)
+    hotkeys(SHORTCUTS.PLATZI_QUIZ.SELECT_BY_NUMBER, (event) => {
       const optionButtons = $$<HTMLButtonElement>(
-        'button[data-testid="QuestionOption-content"]'
+        SELECTORS.PLATZI_QUIZ.QUIZ_OPTIONS
       );
 
       if (optionButtons.length === 0) return;
 
-      // Convert key to 0-based index (1→0, 2→1, etc)
       const index = Number(event.key) - 1;
 
       if (index >= 0 && index < optionButtons.length) {
@@ -193,9 +163,7 @@ export default defineContentScript({
             65 + index
           )})`
         );
-        // Reset selection after clicking
-        selectedOptionIndex = -1;
-        highlightOption(-1);
+        navigator.cancel(); // Clear any previous arrow key selection
       }
     });
   },
