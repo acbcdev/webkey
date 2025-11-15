@@ -1,33 +1,28 @@
 import hotkeys from "hotkeys-js";
+import { SELECTORS, SHORTCUTS } from "@/lib/constants";
 import { $ } from "@/lib/query";
 
 export default defineContentScript({
   matches: ["*://mail.google.com/*"],
   main() {
     // Left arrow or '<' for newer email
-    hotkeys("left, <", () => {
-      const newerButton = $<HTMLElement>(
-        '[aria-label="Newer"], [aria-label="Más reciente"]'
-      );
+    hotkeys(SHORTCUTS.GMAIL.NEWER, () => {
+      const newerButton = $<HTMLElement>(SELECTORS.GMAIL.NEWER_BUTTON);
       if (newerButton && newerButton.getAttribute("aria-disabled") !== "true") {
         newerButton.click();
       }
     });
 
     // Right arrow or '>' for older email
-    hotkeys("right, >", () => {
-      const olderButton = $<HTMLElement>(
-        '[aria-label="Older"], [aria-label="Anterior"]'
-      );
+    hotkeys(SHORTCUTS.GMAIL.OLDER, () => {
+      const olderButton = $<HTMLElement>(SELECTORS.GMAIL.OLDER_BUTTON);
       if (olderButton && olderButton.getAttribute("aria-disabled") !== "true") {
         olderButton.click();
       }
     });
 
-    // const modifier = isMac ? "" : "ctrl+shift";
-    // `${modifier}+1,${modifier}+2,${modifier}+3,${modifier}+4,${modifier}+5,${modifier}+6,${modifier}+7,${modifier}+8,${modifier}+9`
-    const keys = "1,2,3,4,5,6,7,8,9";
-    hotkeys(keys, (event) => {
+    // Switch to account by number (1-9)
+    hotkeys(SHORTCUTS.GMAIL.ACCOUNT_SWITCH, (event) => {
       const numberPressed = parseInt(event.key, 10);
       if (numberPressed >= 1 && numberPressed <= 9) {
         switchToAccount(numberPressed - 1);
@@ -35,12 +30,13 @@ export default defineContentScript({
     });
 
     // Press '0' to go to inbox
-    hotkeys("0", () => {
+    hotkeys(SHORTCUTS.GMAIL.INBOX, () => {
       goToInbox();
     });
-    // Press Enter to click the back/send button (e.g., in conversation or compose view)
-    hotkeys("enter", () => {
-      const mailRow = $<HTMLElement>(".btb");
+
+    // Press Enter to click the back/send button
+    hotkeys(SHORTCUTS.GMAIL.BACK_SEND, () => {
+      const mailRow = $<HTMLElement>(SELECTORS.GMAIL.BACK_SEND_BUTTON);
       if (mailRow) {
         try {
           mailRow.click();
@@ -53,21 +49,19 @@ export default defineContentScript({
 
     // Function to switch to a specific account by index via URL modification
     function switchToAccount(index: number) {
-      // Build new URL - always go to inbox when switching accounts
       const newUrl = `https://mail.google.com/mail/u/${index}/#inbox`;
       window.location.href = newUrl;
     }
 
     // Function to go to inbox
     function goToInbox() {
-      // Try to find the inbox button in the sidebar (supports English and Spanish)
-      const inboxButton = $<HTMLElement>(
-        '[data-tooltip="Inbox"], [data-tooltip="Recibidos"]'
-      );
+      const inboxButton = $<HTMLElement>(SELECTORS.GMAIL.INBOX_BUTTON);
 
       if (inboxButton) {
-        // Find the link inside the inbox button
-        const inboxLink = $<HTMLElement>("a", inboxButton);
+        const inboxLink = $<HTMLElement>(
+          SELECTORS.GMAIL.INBOX_LINK,
+          inboxButton
+        );
         if (inboxLink) {
           inboxLink.click();
           console.log("Gmail: Clicked inbox button");
