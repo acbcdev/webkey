@@ -5,8 +5,18 @@ import { $ } from "@/lib/query";
 export default defineContentScript({
   matches: ["*://mail.google.com/*"],
   main() {
+    // Helper function to check if projector mode is active
+    const isProjectorMode = () => {
+      // Gmail uses hash routing, so we need to parse the hash
+      const hash = window.location.hash;
+      const hashParams = new URLSearchParams(hash.split("?")[1] || "");
+      const projectorParam = hashParams.get("projector");
+      return projectorParam === "1";
+    };
+
     // Left arrow or '<' for newer email
     hotkeys(SHORTCUTS.GMAIL.NEWER, () => {
+      if (isProjectorMode()) return;
       const newerButton = $<HTMLElement>(SELECTORS.GMAIL.NEWER_BUTTON);
       if (newerButton && newerButton.getAttribute("aria-disabled") !== "true") {
         newerButton.click();
@@ -15,6 +25,8 @@ export default defineContentScript({
 
     // Right arrow or '>' for older email
     hotkeys(SHORTCUTS.GMAIL.OLDER, () => {
+      if (isProjectorMode()) return;
+
       const olderButton = $<HTMLElement>(SELECTORS.GMAIL.OLDER_BUTTON);
       if (olderButton && olderButton.getAttribute("aria-disabled") !== "true") {
         olderButton.click();
