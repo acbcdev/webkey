@@ -99,3 +99,31 @@ export function highlightElement(
     flashOutline(selectedElement, color);
   }
 }
+
+/**
+ * Mark element as discarded (wrong answer)
+ * @param element - Element to mark as discarded
+ */
+export function markAsDiscarded(element: HTMLElement): void {
+  element.style.border = `1px solid ${VISUAL.DISCARDED_COLOR}`;
+  element.setAttribute("data-mark-state", "discarded");
+}
+
+/**
+ * Mark element as maybe (uncertain answer)
+ * @param element - Element to mark as maybe
+ */
+export function markAsMaybe(element: HTMLElement): void {
+  element.style.border = `1px solid ${VISUAL.MAYBE_COLOR}`;
+  element.setAttribute("data-mark-state", "maybe");
+}
+
+/**
+ * Clear mark state from element (return to idle)
+ * @param element - Element to clear mark state from
+ */
+export function clearMarkState(element: HTMLElement): void {
+  element.style.border = "";
+  element.style.textDecoration = "";
+  element.removeAttribute("data-mark-state");
+}
