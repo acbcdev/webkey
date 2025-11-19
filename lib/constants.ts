@@ -37,6 +37,8 @@ export const VISUAL = {
   FEEDBACK_COLOR: "#4CAF50",
   ERROR_COLOR: "#f44336",
   WARNING_COLOR: "#ff9800",
+  DISCARDED_COLOR: "#f44336",
+  MAYBE_COLOR: "#2196F3",
   OUTLINE_WIDTH: 3,
   OUTLINE_OFFSET: 2,
   TRANSITION_DURATION: 300,
@@ -65,6 +67,8 @@ export const SHORTCUTS = {
     CANCEL_SELECTION: "esc",
     SELECT_BY_LETTER: "a,b,c,d,e",
     SELECT_BY_NUMBER: "1,2,3,4,5",
+    MARK_DISCARDED: "left",
+    MARK_MAYBE: "right",
   },
   NOTION: {
     ADD_NEW_ITEM: "n",
