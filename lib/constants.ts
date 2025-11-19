@@ -21,6 +21,8 @@ export const SELECTORS = {
   PLATZI_QUIZ: {
     QUIZ_OPTIONS: 'button[data-testid="QuestionOption-content"]',
     OPTION_LETTER: ".QuestionOption-letter-span",
+    OPTION_LETTER_ELEMENT: ".QuestionOption-letter",
+    OPTION_TEXT_ELEMENT: ".QuestionOption-text",
     CONTROL_BAR: ".ControlBar-content",
     CONTROL_BUTTONS: "button:not([disabled])",
     START_EXAM_BUTTON: 'button[data-trans="StartExam.cta.takeTest"]',

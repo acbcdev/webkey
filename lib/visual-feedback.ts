@@ -3,7 +3,8 @@
  * Provides different types of visual indicators (background flash, outline, border)
  */
 
-import { VISUAL } from "./constants";
+import { VISUAL, SELECTORS } from "./constants";
+import { $ } from "./query";
 
 /**
  * Flash element background with color animation
@@ -107,6 +108,17 @@ export function highlightElement(
 export function markAsDiscarded(element: HTMLElement): void {
   element.style.border = `1px solid ${VISUAL.DISCARDED_COLOR}`;
   element.setAttribute("data-mark-state", "discarded");
+  const letter = $(SELECTORS.PLATZI_QUIZ.OPTION_LETTER_ELEMENT, element);
+  const text = $(SELECTORS.PLATZI_QUIZ.OPTION_TEXT_ELEMENT, element);
+  if (text) {
+    text.style.textDecoration = "line-through";
+    text.style.textDecorationColor = VISUAL.DISCARDED_COLOR;
+  }
+  if (letter) {
+    letter.style.backgroundColor = VISUAL.DISCARDED_COLOR;
+    letter.style.borderRadius = "0";
+    element.style.overflow = "hidden";
+  }
 }
 
 /**
@@ -116,6 +128,17 @@ export function markAsDiscarded(element: HTMLElement): void {
 export function markAsMaybe(element: HTMLElement): void {
   element.style.border = `1px solid ${VISUAL.MAYBE_COLOR}`;
   element.setAttribute("data-mark-state", "maybe");
+  const letter = $(SELECTORS.PLATZI_QUIZ.OPTION_LETTER_ELEMENT, element);
+  const text = $(SELECTORS.PLATZI_QUIZ.OPTION_TEXT_ELEMENT, element);
+  if (text) {
+    text.style.textDecoration = "underline";
+    text.style.textDecorationColor = VISUAL.MAYBE_COLOR;
+  }
+  if (letter) {
+    letter.style.backgroundColor = VISUAL.MAYBE_COLOR;
+    letter.style.borderRadius = "0";
+    element.style.overflow = "hidden";
+  }
 }
 
 /**
@@ -126,4 +149,8 @@ export function clearMarkState(element: HTMLElement): void {
   element.style.border = "";
   element.style.textDecoration = "";
   element.removeAttribute("data-mark-state");
+  const letter = $(SELECTORS.PLATZI_QUIZ.OPTION_LETTER_ELEMENT, element);
+  const text = $(SELECTORS.PLATZI_QUIZ.OPTION_TEXT_ELEMENT, element);
+  if (letter) letter.style.backgroundColor = "";
+  if (text) text.style.textDecoration = "";
 }
