@@ -5,7 +5,13 @@ import {
 } from "@/lib/button-finder";
 import { SELECTORS, SHORTCUTS } from "@/lib/constants";
 import { $, $$ } from "@/lib/query";
-import { clearOutline, highlightElement } from "@/lib/visual-feedback";
+import {
+  clearMarkState,
+  clearOutline,
+  highlightElement,
+  markAsDiscarded,
+  markAsMaybe,
+} from "@/lib/visual-feedback";
 
 /**
  * Manages quiz option navigation state and highlighting via arrow keys
@@ -13,6 +19,11 @@ import { clearOutline, highlightElement } from "@/lib/visual-feedback";
  */
 class QuizNavigator {
   private selectedIndex: number = -1;
+  private markedStates: Map<number, "discarded" | "maybe"> = new Map();
+
+  private isValidSelection(length: number): boolean {
+    return this.selectedIndex >= 0 && this.selectedIndex < length;
+  }
 
   next(): void {
     const optionButtons = $$<HTMLButtonElement>(
@@ -54,7 +65,7 @@ class QuizNavigator {
       SELECTORS.PLATZI_QUIZ.QUIZ_OPTIONS
     );
 
-    if (this.selectedIndex >= 0 && this.selectedIndex < optionButtons.length) {
+    if (this.isValidSelection(optionButtons.length)) {
       optionButtons[this.selectedIndex].click();
       console.log(`Platzi: Clicked option ${this.selectedIndex}`);
       this.cancel();
@@ -77,6 +88,73 @@ class QuizNavigator {
       clearOutline(btn);
     });
     console.log("Platzi: Cancelled option selection");
+  }
+
+  toggleDiscarded(): void {
+    const optionButtons = $$<HTMLButtonElement>(
+      SELECTORS.PLATZI_QUIZ.QUIZ_OPTIONS
+    );
+
+    if (!this.isValidSelection(optionButtons.length)) return;
+
+    const button = optionButtons[this.selectedIndex];
+    const currentState = this.markedStates.get(this.selectedIndex);
+
+    if (currentState !== "discarded") {
+      // Mark as discarded
+      this.markedStates.set(this.selectedIndex, "discarded");
+      markAsDiscarded(button);
+      console.log(`Platzi: Marked option ${this.selectedIndex} as discarded`);
+    } else {
+      // Remove discarded mark
+      this.markedStates.delete(this.selectedIndex);
+      clearMarkState(button);
+      console.log(
+        `Platzi: Unmarked option ${this.selectedIndex} as discarded`
+      );
+    }
+
+    this.updateHighlight(optionButtons);
+  }
+
+  toggleMaybe(): void {
+    const optionButtons = $$<HTMLButtonElement>(
+      SELECTORS.PLATZI_QUIZ.QUIZ_OPTIONS
+    );
+
+    if (!this.isValidSelection(optionButtons.length)) return;
+
+    const button = optionButtons[this.selectedIndex];
+    const currentState = this.markedStates.get(this.selectedIndex);
+
+    if (currentState !== "maybe") {
+      // Mark as maybe
+      this.markedStates.set(this.selectedIndex, "maybe");
+      markAsMaybe(button);
+      console.log(`Platzi: Marked option ${this.selectedIndex} as maybe`);
+    } else {
+      // Remove maybe mark
+      this.markedStates.delete(this.selectedIndex);
+      clearMarkState(button);
+      console.log(`Platzi: Unmarked option ${this.selectedIndex} as maybe`);
+    }
+
+    this.updateHighlight(optionButtons);
+  }
+
+  clearAllMarkStates(): void {
+    const optionButtons = $$<HTMLButtonElement>(
+      SELECTORS.PLATZI_QUIZ.QUIZ_OPTIONS
+    );
+
+    optionButtons.forEach((btn, index) => {
+      if (this.markedStates.has(index)) {
+        clearMarkState(btn);
+      }
+    });
+
+    this.markedStates.clear();
+    console.log("Platzi: Cleared all marked states");
   }
 
   private updateHighlight(optionButtons: NodeListOf<HTMLButtonElement>): void {
@@ -108,6 +186,9 @@ export default defineContentScript({
 
     // Enter key to click the highlighted option or control buttons
     hotkeys(SHORTCUTS.PLATZI_QUIZ.SELECT_OPTION, () => {
+      // Clear all mark states when submitting answer
+      navigator.clearAllMarkStates();
+
       // If an option is highlighted via arrow keys, click it
       if (navigator.clickCurrent()) {
         return;
@@ -123,6 +204,16 @@ export default defineContentScript({
     // Press ESC to cancel option selection
     hotkeys(SHORTCUTS.PLATZI_QUIZ.CANCEL_SELECTION, () => {
       navigator.cancel();
+    });
+
+    // Press Left arrow to mark/unmark option as discarded
+    hotkeys(SHORTCUTS.PLATZI_QUIZ.MARK_DISCARDED, () => {
+      navigator.toggleDiscarded();
+    });
+
+    // Press Right arrow to mark/unmark option as maybe
+    hotkeys(SHORTCUTS.PLATZI_QUIZ.MARK_MAYBE, () => {
+      navigator.toggleMaybe();
     });
 
     // Press 'a', 'b', 'c', 'd', or 'e' to select quiz options by letter (direct selection)
