@@ -5,6 +5,12 @@
 
 import { $$ } from "@/lib/dom/query"
 import { VISUAL } from "@/lib/ui/colors"
+import { PLATZI_QUIZ_SELECTORS } from "./constants"
+import {
+	getMarkStateColor,
+	getNextMarkState,
+	MarkStateManager,
+} from "./mark-state"
 import {
 	clearMarkState,
 	clearOutline,
@@ -13,12 +19,6 @@ import {
 	markAsDiscarded,
 	markAsMaybe,
 } from "./mark-states"
-import { PLATZI_QUIZ_SELECTORS } from "./constants"
-import {
-	getMarkStateColor,
-	getNextMarkState,
-	MarkStateManager,
-} from "./mark-state"
 
 /**
  * Manages quiz navigation state
