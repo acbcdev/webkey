@@ -102,23 +102,39 @@ export function highlightElement(
 }
 
 /**
+ * Apply mark state to element with custom styling
+ * @param element - Element to mark
+ * @param state - State type ("discarded" or "maybe")
+ * @param color - Color for the mark
+ * @param decoration - Text decoration style ("line-through" or "underline")
+ */
+function applyMarkState(
+  element: HTMLElement,
+  state: "discarded" | "maybe",
+  color: string,
+  decoration: "line-through" | "underline"
+): void {
+  element.style.border = `1px solid ${color}`;
+  element.setAttribute("data-mark-state", state);
+  const letter = $(SELECTORS.PLATZI_QUIZ.OPTION_LETTER_ELEMENT, element);
+  const text = $(SELECTORS.PLATZI_QUIZ.OPTION_TEXT_ELEMENT, element);
+  if (text) {
+    text.style.textDecoration = decoration;
+    text.style.textDecorationColor = color;
+  }
+  if (letter) {
+    letter.style.backgroundColor = color;
+    letter.style.borderRadius = "0";
+    element.style.overflow = "hidden";
+  }
+}
+
+/**
  * Mark element as discarded (wrong answer)
  * @param element - Element to mark as discarded
  */
 export function markAsDiscarded(element: HTMLElement): void {
-  element.style.border = `1px solid ${VISUAL.DISCARDED_COLOR}`;
-  element.setAttribute("data-mark-state", "discarded");
-  const letter = $(SELECTORS.PLATZI_QUIZ.OPTION_LETTER_ELEMENT, element);
-  const text = $(SELECTORS.PLATZI_QUIZ.OPTION_TEXT_ELEMENT, element);
-  if (text) {
-    text.style.textDecoration = "line-through";
-    text.style.textDecorationColor = VISUAL.DISCARDED_COLOR;
-  }
-  if (letter) {
-    letter.style.backgroundColor = VISUAL.DISCARDED_COLOR;
-    letter.style.borderRadius = "0";
-    element.style.overflow = "hidden";
-  }
+  applyMarkState(element, "discarded", VISUAL.DISCARDED_COLOR, "line-through");
 }
 
 /**
@@ -126,19 +142,7 @@ export function markAsDiscarded(element: HTMLElement): void {
  * @param element - Element to mark as maybe
  */
 export function markAsMaybe(element: HTMLElement): void {
-  element.style.border = `1px solid ${VISUAL.MAYBE_COLOR}`;
-  element.setAttribute("data-mark-state", "maybe");
-  const letter = $(SELECTORS.PLATZI_QUIZ.OPTION_LETTER_ELEMENT, element);
-  const text = $(SELECTORS.PLATZI_QUIZ.OPTION_TEXT_ELEMENT, element);
-  if (text) {
-    text.style.textDecoration = "underline";
-    text.style.textDecorationColor = VISUAL.MAYBE_COLOR;
-  }
-  if (letter) {
-    letter.style.backgroundColor = VISUAL.MAYBE_COLOR;
-    letter.style.borderRadius = "0";
-    element.style.overflow = "hidden";
-  }
+  applyMarkState(element, "maybe", VISUAL.MAYBE_COLOR, "underline");
 }
 
 /**
