@@ -1,5 +1,5 @@
 import hotkeys from "hotkeys-js";
-import { SELECTORS, SHORTCUTS } from "@/lib/constants";
+import { SELECTORS, SHORTCUTS, GMAIL } from "@/lib/constants";
 import { $ } from "@/lib/query";
 
 export default defineContentScript({
@@ -7,11 +7,9 @@ export default defineContentScript({
   main() {
     // Helper function to check if projector mode is active
     const isProjectorMode = () => {
-      // Gmail uses hash routing, so we need to parse the hash
       const hash = window.location.hash;
-      const hashParams = new URLSearchParams(hash.split("?")[1] || "");
-      const projectorParam = hashParams.get("projector");
-      return projectorParam === "1";
+      const hashParams = new URLSearchParams(hash.split(GMAIL.HASH_SEPARATOR)[1] || "");
+      return hashParams.get(GMAIL.PROJECTOR_HASH_PARAM) === "1";
     };
 
     // Left arrow or '<' for newer email
@@ -36,7 +34,7 @@ export default defineContentScript({
     // Switch to account by number (1-9)
     hotkeys(SHORTCUTS.GMAIL.ACCOUNT_SWITCH, (event) => {
       const numberPressed = parseInt(event.key, 10);
-      if (numberPressed >= 1 && numberPressed <= 9) {
+      if (numberPressed >= GMAIL.MIN_ACCOUNT && numberPressed <= GMAIL.MAX_ACCOUNT) {
         switchToAccount(numberPressed - 1);
       }
     });
@@ -61,8 +59,7 @@ export default defineContentScript({
 
     // Function to switch to a specific account by index via URL modification
     function switchToAccount(index: number) {
-      const newUrl = `https://mail.google.com/mail/u/${index}/#inbox`;
-      window.location.href = newUrl;
+      window.location.href = GMAIL.URLS.ACCOUNT_INBOX(index);
     }
 
     // Function to go to inbox
@@ -83,10 +80,9 @@ export default defineContentScript({
 
       // Fallback: navigate via URL if button not found
       const currentUrl = window.location.href;
-      const accountMatch = currentUrl.match(/\/mail\/u\/(\d+)\//);
+      const accountMatch = currentUrl.match(GMAIL.ACCOUNT_INDEX_REGEX);
       const currentAccount = accountMatch ? accountMatch[1] : "0";
-      const inboxUrl = `https://mail.google.com/mail/u/${currentAccount}/#inbox`;
-      window.location.href = inboxUrl;
+      window.location.href = GMAIL.URLS.ACCOUNT_INBOX(parseInt(currentAccount));
     }
   },
 });
