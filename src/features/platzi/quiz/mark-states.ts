@@ -3,8 +3,25 @@
  * Handles mark state styling (discarded/maybe/confident) and option highlighting
  */
 
+import {
+	check as checkIcon,
+	question as questionIcon,
+	x as xIcon,
+} from "@/features/platzi/icons";
 import { $ } from "@/lib/dom/query";
 import { VISUAL } from "@/lib/ui/colors";
+
+/**
+ * Get the SVG icon for a mark state
+ */
+function getIconForState(state: "discarded" | "maybe" | "confident"): string {
+	const iconMap: Record<"discarded" | "maybe" | "confident", string> = {
+		discarded: xIcon,
+		maybe: questionIcon,
+		confident: checkIcon,
+	};
+	return iconMap[state];
+}
 
 /**
  * Apply mark state to element with custom styling
@@ -33,6 +50,58 @@ function applyMarkState(
 		letter.style.backgroundColor = color;
 		letter.style.borderRadius = "0";
 		element.style.overflow = "hidden";
+		letter.style.position = "relative";
+
+		// Remove ALL existing icons from previous states
+		const existingIcons = letter.querySelectorAll(".mark-state-icon");
+
+		existingIcons.forEach((icon) => {
+			icon.remove();
+		});
+
+		// Hide the letter text with opacity (the actual letter like A, B, C, D)
+		const letterText = letter.querySelector("span");
+		if (letterText) {
+			letterText.style.opacity = "0";
+			letterText.style.transition = "opacity 300ms ease-in-out";
+		}
+
+		// Inject SVG icon into letter box
+		const iconSvg = getIconForState(state);
+		const iconWrapper = document.createElement("div");
+		iconWrapper.className = "mark-state-icon";
+		iconWrapper.innerHTML = iconSvg;
+		iconWrapper.style.cssText = `
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 100%;
+			height: 100%;
+			opacity: 0;
+			transition: opacity 300ms ease-in-out;
+			color: white;
+			pointer-events: none;
+		`;
+
+		// Apply color to SVG strokes
+		const svg = iconWrapper.querySelector("svg");
+		if (svg) {
+			svg.style.stroke = "white";
+			svg.style.width = "18px";
+			svg.style.height = "18px";
+		}
+
+		// Append new icon
+		letter.appendChild(iconWrapper);
+
+		// Trigger animation
+		requestAnimationFrame(() => {
+			iconWrapper.style.opacity = "1";
+		});
 	}
 }
 
@@ -107,7 +176,21 @@ export function clearMarkState(
 	element.removeAttribute("data-mark-state");
 	const letter = $(optionLetterSelector, element);
 	const text = $(optionTextSelector, element);
-	if (letter) letter.style.backgroundColor = "";
+	if (letter) {
+		letter.style.backgroundColor = "";
+		letter.style.position = "";
+		// Remove ALL injected icons
+		const icons = letter.querySelectorAll(".mark-state-icon");
+		icons.forEach((icon) => {
+			icon.remove();
+		});
+		// Restore letter text opacity
+		const letterText = letter.querySelector("span");
+		if (letterText) {
+			letterText.style.opacity = "";
+			letterText.style.transition = "";
+		}
+	}
 	if (text) text.style.textDecoration = "";
 }
 
