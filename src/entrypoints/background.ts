@@ -1,3 +1,3 @@
 export default defineBackground(() => {
-  // Background script loaded
-});
+	// Background script loaded
+})

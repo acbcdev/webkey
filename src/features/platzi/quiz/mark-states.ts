@@ -7,9 +7,9 @@ import {
 	check as checkIcon,
 	question as questionIcon,
 	x as xIcon,
-} from "@/features/platzi/icons";
-import { $ } from "@/lib/dom/query";
-import { VISUAL } from "@/lib/ui/colors";
+} from "@/features/platzi/icons"
+import { $ } from "@/lib/dom/query"
+import { VISUAL } from "@/lib/ui/colors"
 
 /**
  * Get the SVG icon for a mark state
@@ -19,58 +19,63 @@ function getIconForState(state: "discarded" | "maybe" | "confident"): string {
 		discarded: xIcon,
 		maybe: questionIcon,
 		confident: checkIcon,
-	};
-	return iconMap[state];
+	}
+	return iconMap[state]
+}
+
+interface ApplyMarkStateOptions {
+	element: HTMLElement
+	state: "discarded" | "maybe" | "confident"
+	color: string
+	decoration?: "line-through" | "underline"
+	optionLetterSelector: string
+	optionTextSelector: string
 }
 
 /**
  * Apply mark state to element with custom styling
- * @param element - Element to mark
- * @param state - State type ("discarded", "maybe", or "confident")
- * @param color - Color for the mark
- * @param decoration - Text decoration style ("line-through" or "underline")
  */
-function applyMarkState(
-	element: HTMLElement,
-	state: "discarded" | "maybe" | "confident",
-	color: string,
-	decoration: "line-through" | "underline",
-	optionLetterSelector: string,
-	optionTextSelector: string,
-): void {
-	element.style.border = `1px solid ${color}`;
-	element.setAttribute("data-mark-state", state);
-	const letter = $(optionLetterSelector, element);
-	const text = $(optionTextSelector, element);
+function applyMarkState({
+	element,
+	state,
+	color,
+	decoration,
+	optionLetterSelector,
+	optionTextSelector,
+}: ApplyMarkStateOptions): void {
+	element.style.border = `1px solid ${color}`
+	element.setAttribute("data-mark-state", state)
+	const letter = $(optionLetterSelector, element)
+	const text = $(optionTextSelector, element)
 	if (text) {
-		text.style.textDecoration = decoration;
-		text.style.textDecorationColor = color;
+		text.style.textDecoration = decoration || ""
+		text.style.textDecorationColor = decoration ? color : ""
 	}
 	if (letter) {
-		letter.style.backgroundColor = color;
-		letter.style.borderRadius = "0";
-		element.style.overflow = "hidden";
-		letter.style.position = "relative";
+		letter.style.backgroundColor = color
+		letter.style.borderRadius = "0"
+		element.style.overflow = "hidden"
+		letter.style.position = "relative"
 
 		// Remove ALL existing icons from previous states
-		const existingIcons = letter.querySelectorAll(".mark-state-icon");
+		const existingIcons = letter.querySelectorAll(".mark-state-icon")
 
 		existingIcons.forEach((icon) => {
-			icon.remove();
-		});
+			icon.remove()
+		})
 
 		// Hide the letter text with opacity (the actual letter like A, B, C, D)
-		const letterText = letter.querySelector("span");
+		const letterText = letter.querySelector("span")
 		if (letterText) {
-			letterText.style.opacity = "0";
-			letterText.style.transition = "opacity 300ms ease-in-out";
+			letterText.style.opacity = "0"
+			letterText.style.transition = "opacity 300ms ease-in-out"
 		}
 
 		// Inject SVG icon into letter box
-		const iconSvg = getIconForState(state);
-		const iconWrapper = document.createElement("div");
-		iconWrapper.className = "mark-state-icon";
-		iconWrapper.innerHTML = iconSvg;
+		const iconSvg = getIconForState(state)
+		const iconWrapper = document.createElement("div")
+		iconWrapper.className = "mark-state-icon"
+		iconWrapper.innerHTML = iconSvg
 		iconWrapper.style.cssText = `
 			position: absolute;
 			top: 50%;
@@ -85,23 +90,23 @@ function applyMarkState(
 			transition: opacity 300ms ease-in-out;
 			color: white;
 			pointer-events: none;
-		`;
+		`
 
 		// Apply color to SVG strokes
-		const svg = iconWrapper.querySelector("svg");
+		const svg = iconWrapper.querySelector("svg")
 		if (svg) {
-			svg.style.stroke = "white";
-			svg.style.width = "18px";
-			svg.style.height = "18px";
+			svg.style.stroke = "white"
+			svg.style.width = "18px"
+			svg.style.height = "18px"
 		}
 
 		// Append new icon
-		letter.appendChild(iconWrapper);
+		letter.appendChild(iconWrapper)
 
 		// Trigger animation
 		requestAnimationFrame(() => {
-			iconWrapper.style.opacity = "1";
-		});
+			iconWrapper.style.opacity = "1"
+		})
 	}
 }
 
@@ -114,14 +119,14 @@ export function markAsDiscarded(
 	optionLetterSelector: string,
 	optionTextSelector: string,
 ): void {
-	applyMarkState(
+	applyMarkState({
 		element,
-		"discarded",
-		VISUAL.DISCARDED_COLOR,
-		"line-through",
+		state: "discarded",
+		color: VISUAL.DISCARDED_COLOR,
+		decoration: "line-through",
 		optionLetterSelector,
 		optionTextSelector,
-	);
+	})
 }
 
 /**
@@ -133,14 +138,13 @@ export function markAsMaybe(
 	optionLetterSelector: string,
 	optionTextSelector: string,
 ): void {
-	applyMarkState(
+	applyMarkState({
 		element,
-		"maybe",
-		VISUAL.MAYBE_COLOR,
-		"underline",
+		state: "maybe",
+		color: VISUAL.MAYBE_COLOR,
 		optionLetterSelector,
 		optionTextSelector,
-	);
+	})
 }
 
 /**
@@ -152,14 +156,13 @@ export function markAsConfident(
 	optionLetterSelector: string,
 	optionTextSelector: string,
 ): void {
-	applyMarkState(
+	applyMarkState({
 		element,
-		"confident",
-		VISUAL.CONFIDENT_COLOR,
-		"underline",
+		state: "confident",
+		color: VISUAL.CONFIDENT_COLOR,
 		optionLetterSelector,
 		optionTextSelector,
-	);
+	})
 }
 
 /**
@@ -171,35 +174,35 @@ export function clearMarkState(
 	optionLetterSelector: string,
 	optionTextSelector: string,
 ): void {
-	element.style.border = "";
-	element.style.textDecoration = "";
-	element.removeAttribute("data-mark-state");
-	const letter = $(optionLetterSelector, element);
-	const text = $(optionTextSelector, element);
+	element.style.border = ""
+	element.style.textDecoration = ""
+	element.removeAttribute("data-mark-state")
+	const letter = $(optionLetterSelector, element)
+	const text = $(optionTextSelector, element)
 	if (letter) {
-		letter.style.backgroundColor = "";
-		letter.style.position = "";
+		letter.style.backgroundColor = ""
+		letter.style.position = ""
 		// Remove ALL injected icons
-		const icons = letter.querySelectorAll(".mark-state-icon");
+		const icons = letter.querySelectorAll(".mark-state-icon")
 		icons.forEach((icon) => {
-			icon.remove();
-		});
+			icon.remove()
+		})
 		// Restore letter text opacity
-		const letterText = letter.querySelector("span");
+		const letterText = letter.querySelector("span")
 		if (letterText) {
-			letterText.style.opacity = "";
-			letterText.style.transition = "";
+			letterText.style.opacity = ""
+			letterText.style.transition = ""
 		}
 	}
-	if (text) text.style.textDecoration = "";
+	if (text) text.style.textDecoration = ""
 }
 
 /**
  * Clear outline from element
  */
 export function clearOutline(element: HTMLElement): void {
-	element.style.outline = "";
-	element.style.outlineOffset = "";
+	element.style.outline = ""
+	element.style.outlineOffset = ""
 }
 
 /**
@@ -215,12 +218,12 @@ export function highlightElement(
 ): void {
 	// Clear all previous highlights
 	allElements.forEach((el) => {
-		clearOutline(el);
-	});
+		clearOutline(el)
+	})
 
 	// Highlight the selected element
 	if (selectedElement) {
-		selectedElement.style.outline = `3px solid ${color}`;
-		selectedElement.style.outlineOffset = "2px";
+		selectedElement.style.outline = `3px solid ${color}`
+		selectedElement.style.outlineOffset = "2px"
 	}
 }

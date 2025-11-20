@@ -6,10 +6,10 @@
  * @returns The first matching element of type T, or null if no match is found.
  */
 export function $<T extends HTMLElement>(
-  query: string,
-  context: Document | HTMLElement = document
+	query: string,
+	context: Document | HTMLElement = document,
 ): T | null {
-  return context.querySelector(query) as T | null;
+	return context.querySelector(query) as T | null
 }
 
 /**
@@ -20,8 +20,8 @@ export function $<T extends HTMLElement>(
  * @returns A NodeList of all matching elements of type T.
  */
 export function $$<T extends HTMLElement>(
-  query: string,
-  context: Document | HTMLElement = document
+	query: string,
+	context: Document | HTMLElement = document,
 ): NodeListOf<T> {
-  return context.querySelectorAll(query) as NodeListOf<T>;
+	return context.querySelectorAll(query) as NodeListOf<T>
 }

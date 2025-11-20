@@ -7,7 +7,7 @@
  * @returns true if the platform is macOS or iOS
  */
 export function isMac(): boolean {
-  return /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
+	return /Mac|iPhone|iPad|iPod/.test(navigator.userAgent)
 }
 
 /**
@@ -15,7 +15,7 @@ export function isMac(): boolean {
  * @returns true if the platform is Windows
  */
 export function isWindows(): boolean {
-  return /Windows|Win32/.test(navigator.userAgent);
+	return /Windows|Win32/.test(navigator.userAgent)
 }
 
 /**
@@ -23,5 +23,5 @@ export function isWindows(): boolean {
  * @returns true if the platform is Linux
  */
 export function isLinux(): boolean {
-  return /Linux|X11/.test(navigator.userAgent);
+	return /Linux|X11/.test(navigator.userAgent)
 }

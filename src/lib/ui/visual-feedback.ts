@@ -4,7 +4,7 @@
  * For quiz-specific visual styling, see features/platzi/quiz/mark-states.ts
  */
 
-import { VISUAL } from "./colors";
+import { VISUAL } from "./colors"
 
 /**
  * Flash element background with color animation
@@ -17,16 +17,16 @@ export async function flashBackground(
 	color: string = VISUAL.FEEDBACK_COLOR,
 	duration: number = VISUAL.TRANSITION_DURATION,
 ): Promise<void> {
-	const originalBackground = element.style.backgroundColor;
-	element.style.backgroundColor = color;
-	element.style.transition = `background-color ${duration}ms`;
+	const originalBackground = element.style.backgroundColor
+	element.style.backgroundColor = color
+	element.style.transition = `background-color ${duration}ms`
 
 	return new Promise((resolve) => {
 		setTimeout(() => {
-			element.style.backgroundColor = originalBackground;
-			resolve();
-		}, duration);
-	});
+			element.style.backgroundColor = originalBackground
+			resolve()
+		}, duration)
+	})
 }
 
 /**
@@ -42,6 +42,6 @@ export function flashOutline(
 	width: number = VISUAL.OUTLINE_WIDTH,
 	offset: number = VISUAL.OUTLINE_OFFSET,
 ): void {
-	element.style.outline = `${width}px solid ${color}`;
-	element.style.outlineOffset = `${offset}px`;
+	element.style.outline = `${width}px solid ${color}`
+	element.style.outlineOffset = `${offset}px`
 }
