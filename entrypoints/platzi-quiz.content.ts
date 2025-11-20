@@ -9,6 +9,7 @@ import {
   clearMarkState,
   clearOutline,
   highlightElement,
+  markAsConfident,
   markAsDiscarded,
   markAsMaybe,
 } from "@/lib/visual-feedback";
@@ -17,9 +18,11 @@ import {
  * Manages quiz option navigation state and highlighting via arrow keys
  * Handles up/down navigation, clicking selected option, and cancellation
  */
+type MarkState = "discarded" | "maybe" | "confident";
+
 class QuizNavigator {
   private selectedIndex: number = -1;
-  private markedStates: Map<number, "discarded" | "maybe"> = new Map();
+  private markedStates: Map<number, MarkState> = new Map();
 
   private isValidSelection(length: number): boolean {
     return this.selectedIndex >= 0 && this.selectedIndex < length;
@@ -82,7 +85,7 @@ class QuizNavigator {
     console.log("Platzi: Cancelled option selection");
   }
 
-  toggleMark(markType: "discarded" | "maybe"): void {
+  cycleMark(direction: "forward" | "backward"): void {
     const optionButtons = $$<HTMLButtonElement>(
       SELECTORS.PLATZI_QUIZ.QUIZ_OPTIONS
     );
@@ -92,27 +95,48 @@ class QuizNavigator {
     const button = optionButtons[this.selectedIndex];
     const currentState = this.markedStates.get(this.selectedIndex);
 
-    if (currentState !== markType) {
-      // Mark the option
-      this.markedStates.set(this.selectedIndex, markType);
-      markType === "discarded" ? markAsDiscarded(button) : markAsMaybe(button);
-      console.log(`Platzi: Marked option ${this.selectedIndex} as ${markType}`);
-    } else {
-      // Remove mark
+    // Define cycle order for each direction
+    const forwardCycle: (MarkState | null)[] = [null, "maybe", "confident", "discarded"];
+    const backwardCycle: (MarkState | null)[] = [null, "discarded", "confident", "maybe"];
+
+    const cycle = direction === "forward" ? forwardCycle : backwardCycle;
+    const currentIndex = cycle.indexOf(currentState ?? null);
+    const nextIndex = (currentIndex + 1) % cycle.length;
+    const nextState = cycle[nextIndex];
+
+    // Apply the new state
+    if (nextState === null) {
       this.markedStates.delete(this.selectedIndex);
       clearMarkState(button);
-      console.log(`Platzi: Unmarked option ${this.selectedIndex} as ${markType}`);
+      console.log(`Platzi: Unmarked option ${this.selectedIndex}`);
+    } else {
+      this.markedStates.set(this.selectedIndex, nextState);
+
+      // Apply appropriate styling based on state
+      switch (nextState) {
+        case "discarded":
+          markAsDiscarded(button);
+          break;
+        case "maybe":
+          markAsMaybe(button);
+          break;
+        case "confident":
+          markAsConfident(button);
+          break;
+      }
+
+      console.log(`Platzi: Marked option ${this.selectedIndex} as ${nextState}`);
     }
 
     this.updateHighlight(optionButtons);
   }
 
-  toggleDiscarded(): void {
-    this.toggleMark("discarded");
+  cycleForward(): void {
+    this.cycleMark("forward");
   }
 
-  toggleMaybe(): void {
-    this.toggleMark("maybe");
+  cycleBackward(): void {
+    this.cycleMark("backward");
   }
 
   clearAllMarkStates(): void {
@@ -136,9 +160,10 @@ class QuizNavigator {
 
       // Map mark state to outline color
       const markState = this.markedStates.get(this.selectedIndex);
-      const colorMap = {
+      const colorMap: Record<MarkState, string> = {
         discarded: VISUAL.DISCARDED_COLOR,
         maybe: VISUAL.MAYBE_COLOR,
+        confident: VISUAL.CONFIDENT_COLOR,
       };
       const color = markState ? colorMap[markState] : VISUAL.FEEDBACK_COLOR;
 
@@ -188,14 +213,14 @@ export default defineContentScript({
       navigator.cancel();
     });
 
-    // Press Left arrow to mark/unmark option as discarded
+    // Press Left arrow to cycle backward through mark states
     hotkeys(SHORTCUTS.PLATZI_QUIZ.MARK_DISCARDED, () => {
-      navigator.toggleDiscarded();
+      navigator.cycleBackward();
     });
 
-    // Press Right arrow to mark/unmark option as maybe
+    // Press Right arrow to cycle forward through mark states
     hotkeys(SHORTCUTS.PLATZI_QUIZ.MARK_MAYBE, () => {
-      navigator.toggleMaybe();
+      navigator.cycleForward();
     });
 
     // Press 'a', 'b', 'c', 'd', or 'e' to select quiz options by letter (direct selection)

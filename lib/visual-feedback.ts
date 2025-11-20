@@ -104,13 +104,13 @@ export function highlightElement(
 /**
  * Apply mark state to element with custom styling
  * @param element - Element to mark
- * @param state - State type ("discarded" or "maybe")
+ * @param state - State type ("discarded", "maybe", or "confident")
  * @param color - Color for the mark
  * @param decoration - Text decoration style ("line-through" or "underline")
  */
 function applyMarkState(
 	element: HTMLElement,
-	state: "discarded" | "maybe",
+	state: "discarded" | "maybe" | "confident",
 	color: string,
 	decoration: "line-through" | "underline",
 ): void {
@@ -143,6 +143,14 @@ export function markAsDiscarded(element: HTMLElement): void {
  */
 export function markAsMaybe(element: HTMLElement): void {
 	applyMarkState(element, "maybe", VISUAL.MAYBE_COLOR, "underline");
+}
+
+/**
+ * Mark element as confident (sure it's correct)
+ * @param element - Element to mark as confident
+ */
+export function markAsConfident(element: HTMLElement): void {
+	applyMarkState(element, "confident", VISUAL.CONFIDENT_COLOR, "underline");
 }
 
 /**
