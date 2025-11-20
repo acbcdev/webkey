@@ -3,7 +3,7 @@ import {
   clickLastControlBarButton,
   findAndClickButton,
 } from "@/lib/button-finder";
-import { SELECTORS, SHORTCUTS } from "@/lib/constants";
+import { SELECTORS, SHORTCUTS, VISUAL } from "@/lib/constants";
 import { $, $$ } from "@/lib/query";
 import {
   clearMarkState,
@@ -133,7 +133,16 @@ class QuizNavigator {
   private updateHighlight(optionButtons: NodeListOf<HTMLButtonElement>): void {
     if (this.selectedIndex >= 0 && this.selectedIndex < optionButtons.length) {
       const selectedButton = optionButtons[this.selectedIndex];
-      highlightElement(selectedButton, optionButtons);
+
+      // Map mark state to outline color
+      const markState = this.markedStates.get(this.selectedIndex);
+      const colorMap = {
+        discarded: VISUAL.DISCARDED_COLOR,
+        maybe: VISUAL.MAYBE_COLOR,
+      };
+      const color = markState ? colorMap[markState] : VISUAL.FEEDBACK_COLOR;
+
+      highlightElement(selectedButton, optionButtons, color);
       selectedButton.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
   }
