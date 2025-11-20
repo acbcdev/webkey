@@ -6,13 +6,13 @@
 import { $$ } from "@/lib/dom/query";
 import { VISUAL } from "@/lib/ui/colors";
 import {
-	clearMarkState as clearMarkStateUI,
+	clearMarkState,
 	clearOutline,
 	highlightElement,
 	markAsConfident,
 	markAsDiscarded,
 	markAsMaybe,
-} from "@/lib/ui/visual-feedback";
+} from "./mark-states";
 import { PLATZI_QUIZ_SELECTORS } from "./constants";
 import {
 	getMarkStateColor,
@@ -102,7 +102,7 @@ export class QuizNavigator {
 		// Apply the new state
 		if (nextState === null) {
 			this.markStateManager.removeMarkState(this.selectedIndex);
-			clearMarkStateUI(
+			clearMarkState(
 				button,
 				PLATZI_QUIZ_SELECTORS.OPTION_LETTER_ELEMENT,
 				PLATZI_QUIZ_SELECTORS.OPTION_TEXT_ELEMENT,
@@ -160,7 +160,7 @@ export class QuizNavigator {
 		this.markStateManager.getMarkedIndices().forEach((index) => {
 			const btn = optionButtons[index];
 			if (btn) {
-				clearMarkStateUI(
+				clearMarkState(
 					btn,
 					PLATZI_QUIZ_SELECTORS.OPTION_LETTER_ELEMENT,
 					PLATZI_QUIZ_SELECTORS.OPTION_TEXT_ELEMENT,
