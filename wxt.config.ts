@@ -19,4 +19,5 @@ export default defineConfig({
       128: "/icon/128.png",
     },
   },
+  srcDir: "src",
 });

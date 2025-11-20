@@ -2,7 +2,7 @@
  * Clipboard utilities for copying text with optional visual feedback
  */
 
-import { flashBackground, flashOutline } from "./visual-feedback";
+import { flashBackground, flashOutline } from "../ui/visual-feedback";
 
 export interface CopyOptions {
   feedback?: boolean;
