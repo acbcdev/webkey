@@ -46,6 +46,19 @@ export const VISUAL = {
   TRANSITION_DURATION: 300,
 } as const;
 
+export const GMAIL = {
+  URLS: {
+    INBOX_BASE: "https://mail.google.com/mail",
+    ACCOUNT_INBOX: (accountIndex: number) => `https://mail.google.com/mail/u/${accountIndex}/#inbox`,
+    DEFAULT_INBOX: "https://mail.google.com/mail/u/0/#inbox",
+  },
+  ACCOUNT_INDEX_REGEX: /\/mail\/u\/(\d+)\//,
+  PROJECTOR_HASH_PARAM: "projector",
+  HASH_SEPARATOR: "?",
+  MIN_ACCOUNT: 1,
+  MAX_ACCOUNT: 9,
+} as const;
+
 export const SHORTCUTS = {
   GMAIL: {
     NEWER: "left, <",
