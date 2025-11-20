@@ -25,7 +25,7 @@ class QuizNavigator {
     return this.selectedIndex >= 0 && this.selectedIndex < length;
   }
 
-  next(): void {
+  navigate(direction: 1 | -1): void {
     const optionButtons = $$<HTMLButtonElement>(
       SELECTORS.PLATZI_QUIZ.QUIZ_OPTIONS
     );
@@ -33,31 +33,23 @@ class QuizNavigator {
     if (optionButtons.length === 0) return;
 
     if (this.selectedIndex === -1) {
-      this.selectedIndex = 0;
+      this.selectedIndex = direction === 1 ? 0 : optionButtons.length - 1;
     } else {
-      this.selectedIndex = (this.selectedIndex + 1) % optionButtons.length;
+      this.selectedIndex =
+        (this.selectedIndex + direction + optionButtons.length) %
+        optionButtons.length;
     }
 
     this.updateHighlight(optionButtons);
     console.log(`Platzi: Navigated to option ${this.selectedIndex}`);
   }
 
+  next(): void {
+    this.navigate(1);
+  }
+
   previous(): void {
-    const optionButtons = $$<HTMLButtonElement>(
-      SELECTORS.PLATZI_QUIZ.QUIZ_OPTIONS
-    );
-
-    if (optionButtons.length === 0) return;
-
-    if (this.selectedIndex === -1) {
-      this.selectedIndex = optionButtons.length - 1;
-    } else {
-      this.selectedIndex =
-        (this.selectedIndex - 1 + optionButtons.length) % optionButtons.length;
-    }
-
-    this.updateHighlight(optionButtons);
-    console.log(`Platzi: Navigated to option ${this.selectedIndex}`);
+    this.navigate(-1);
   }
 
   clickCurrent(): boolean {
@@ -90,7 +82,7 @@ class QuizNavigator {
     console.log("Platzi: Cancelled option selection");
   }
 
-  toggleDiscarded(): void {
+  toggleMark(markType: "discarded" | "maybe"): void {
     const optionButtons = $$<HTMLButtonElement>(
       SELECTORS.PLATZI_QUIZ.QUIZ_OPTIONS
     );
@@ -100,46 +92,27 @@ class QuizNavigator {
     const button = optionButtons[this.selectedIndex];
     const currentState = this.markedStates.get(this.selectedIndex);
 
-    if (currentState !== "discarded") {
-      // Mark as discarded
-      this.markedStates.set(this.selectedIndex, "discarded");
-      markAsDiscarded(button);
-      console.log(`Platzi: Marked option ${this.selectedIndex} as discarded`);
+    if (currentState !== markType) {
+      // Mark the option
+      this.markedStates.set(this.selectedIndex, markType);
+      markType === "discarded" ? markAsDiscarded(button) : markAsMaybe(button);
+      console.log(`Platzi: Marked option ${this.selectedIndex} as ${markType}`);
     } else {
-      // Remove discarded mark
+      // Remove mark
       this.markedStates.delete(this.selectedIndex);
       clearMarkState(button);
-      console.log(
-        `Platzi: Unmarked option ${this.selectedIndex} as discarded`
-      );
+      console.log(`Platzi: Unmarked option ${this.selectedIndex} as ${markType}`);
     }
 
     this.updateHighlight(optionButtons);
   }
 
+  toggleDiscarded(): void {
+    this.toggleMark("discarded");
+  }
+
   toggleMaybe(): void {
-    const optionButtons = $$<HTMLButtonElement>(
-      SELECTORS.PLATZI_QUIZ.QUIZ_OPTIONS
-    );
-
-    if (!this.isValidSelection(optionButtons.length)) return;
-
-    const button = optionButtons[this.selectedIndex];
-    const currentState = this.markedStates.get(this.selectedIndex);
-
-    if (currentState !== "maybe") {
-      // Mark as maybe
-      this.markedStates.set(this.selectedIndex, "maybe");
-      markAsMaybe(button);
-      console.log(`Platzi: Marked option ${this.selectedIndex} as maybe`);
-    } else {
-      // Remove maybe mark
-      this.markedStates.delete(this.selectedIndex);
-      clearMarkState(button);
-      console.log(`Platzi: Unmarked option ${this.selectedIndex} as maybe`);
-    }
-
-    this.updateHighlight(optionButtons);
+    this.toggleMark("maybe");
   }
 
   clearAllMarkStates(): void {
