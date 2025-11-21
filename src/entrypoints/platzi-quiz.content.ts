@@ -29,7 +29,8 @@ export default defineContentScript({
 		})
 
 		// Enter key to click the highlighted option or control buttons
-		hotkeys(PLATZI_QUIZ_SHORTCUTS.SELECT_OPTION, () => {
+		hotkeys(PLATZI_QUIZ_SHORTCUTS.SELECT_OPTION, (event) => {
+			event.preventDefault()
 			// Clear all mark states when submitting answer
 			navigator.clearAllMarkStates()
 
