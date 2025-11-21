@@ -178,7 +178,7 @@ export class QuizNavigator {
 			const markState = this.markStateManager.getMarkState(this.selectedIndex)
 			const color = markState
 				? getMarkStateColor(markState)
-				: VISUAL.FEEDBACK_COLOR
+				: VISUAL.SELECT_COLOR
 
 			highlightElement(selectedButton, optionButtons, color)
 			selectedButton.scrollIntoView({ behavior: "smooth", block: "nearest" })

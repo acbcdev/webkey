@@ -9,6 +9,7 @@ export const COLORS = {
 	DISCARDED_COLOR: "#f44336",
 	MAYBE_COLOR: "#2196F3",
 	CONFIDENT_COLOR: "#4CAF50",
+	SELECT_COLOR: "#87909D",
 } as const
 
 export const VISUAL = {

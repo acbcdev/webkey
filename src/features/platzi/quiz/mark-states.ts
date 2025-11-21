@@ -214,7 +214,7 @@ export function clearOutline(element: HTMLElement): void {
 export function highlightElement(
 	selectedElement: HTMLElement | null,
 	allElements: NodeListOf<HTMLElement> | HTMLElement[],
-	color: string = VISUAL.FEEDBACK_COLOR,
+	color: string = VISUAL.SELECT_COLOR,
 ): void {
 	// Clear all previous highlights
 	allElements.forEach((el) => {
