@@ -13,17 +13,26 @@ export default defineContentScript({
 		console.log("Platzi: Cursos content script loaded")
 
 		// Double-click event listener for content class
-		document.addEventListener("dblclick", (event) => {
-			const target = event.target as HTMLElement
+		const handleDblClick = (event: Event) => {
+			if (!(event.target instanceof HTMLElement)) return
+
+			const target = event.target
 
 			// Check if the clicked element or its parent has class containing "Articlass__content"
 			const contentElement = target.closest(
 				PLATZI_CURSOS_SELECTORS.CONTENT,
-			) as HTMLElement
+			)
 
-			if (contentElement) {
+			if (contentElement instanceof HTMLElement) {
 				copyElementText(contentElement)
 			}
+		}
+
+		document.addEventListener("dblclick", handleDblClick)
+
+		// Cleanup listener on unload to prevent memory leaks
+		window.addEventListener("unload", () => {
+			document.removeEventListener("dblclick", handleDblClick)
 		})
 
 		// Press 'h' to copy the first h1 element

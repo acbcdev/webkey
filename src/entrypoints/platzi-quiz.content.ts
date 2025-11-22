@@ -10,6 +10,33 @@ import {
 import { QuizNavigator } from "@/features/platzi/quiz/QuizNavigator"
 import { $, $$ } from "@/lib/dom/query"
 
+/**
+ * Helper function to select a quiz option and cancel any previous selection
+ * @param matcher - Function that determines if a button matches the selection criteria
+ * @param logMessage - Message to log when option is selected
+ * @param navigator - QuizNavigator instance to cancel previous selections
+ */
+function selectOptionBy(
+	matcher: (button: HTMLButtonElement, index: number) => boolean,
+	logMessage: string,
+	navigator: QuizNavigator,
+): void {
+	const optionButtons = $$<HTMLButtonElement>(
+		PLATZI_QUIZ_SELECTORS.QUIZ_OPTIONS,
+	)
+
+	if (optionButtons.length === 0) return
+
+	for (let i = 0; i < optionButtons.length; i++) {
+		if (matcher(optionButtons[i], i)) {
+			optionButtons[i].click()
+			console.log(logMessage)
+			navigator.cancel()
+			break
+		}
+	}
+}
+
 export default defineContentScript({
 	matches: [
 		"*://*.platzi.com/clases/examen/*",
@@ -63,44 +90,24 @@ export default defineContentScript({
 
 		// Press 'a', 'b', 'c', 'd', or 'e' to select quiz options by letter (direct selection)
 		hotkeys(PLATZI_QUIZ_SHORTCUTS.SELECT_BY_LETTER, (event) => {
-			const optionButtons = $$<HTMLButtonElement>(
-				PLATZI_QUIZ_SELECTORS.QUIZ_OPTIONS,
+			selectOptionBy(
+				(button) => {
+					const letterSpan = $(PLATZI_QUIZ_SELECTORS.OPTION_LETTER, button)
+					return letterSpan?.textContent?.toLowerCase() === event.key
+				},
+				`Platzi: Selected option ${event.key.toUpperCase()}`,
+				navigator,
 			)
-
-			if (optionButtons.length === 0) return
-
-			// Find the button with the matching letter and click it directly
-			for (const button of optionButtons) {
-				const letterSpan = $(PLATZI_QUIZ_SELECTORS.OPTION_LETTER, button)
-
-				if (letterSpan && letterSpan.textContent?.toLowerCase() === event.key) {
-					button.click()
-					console.log(`Platzi: Selected option ${event.key.toUpperCase()}`)
-					navigator.cancel() // Clear any previous arrow key selection
-					break
-				}
-			}
 		})
 
 		// Press 1-5 to select quiz options by position (direct selection)
 		hotkeys(PLATZI_QUIZ_SHORTCUTS.SELECT_BY_NUMBER, (event) => {
-			const optionButtons = $$<HTMLButtonElement>(
-				PLATZI_QUIZ_SELECTORS.QUIZ_OPTIONS,
-			)
-
-			if (optionButtons.length === 0) return
-
 			const index = Number(event.key) - 1
-
-			if (index >= 0 && index < optionButtons.length) {
-				optionButtons[index].click()
-				console.log(
-					`Platzi: Selected option ${event.key} (${String.fromCharCode(
-						65 + index,
-					)})`,
-				)
-				navigator.cancel() // Clear any previous arrow key selection
-			}
+			selectOptionBy(
+				(_, i) => i === index,
+				`Platzi: Selected option ${event.key} (${String.fromCharCode(65 + index)})`,
+				navigator,
+			)
 		})
 	},
 })

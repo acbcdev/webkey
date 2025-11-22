@@ -27,14 +27,16 @@ export class QuizNavigator {
 	private selectedIndex: number = -1
 	private markStateManager: MarkStateManager = new MarkStateManager()
 
+	private getQuizOptions(): NodeListOf<HTMLButtonElement> {
+		return $$<HTMLButtonElement>(PLATZI_QUIZ_SELECTORS.QUIZ_OPTIONS)
+	}
+
 	private isValidSelection(length: number): boolean {
 		return this.selectedIndex >= 0 && this.selectedIndex < length
 	}
 
 	navigate(direction: 1 | -1): void {
-		const optionButtons = $$<HTMLButtonElement>(
-			PLATZI_QUIZ_SELECTORS.QUIZ_OPTIONS,
-		)
+		const optionButtons = this.getQuizOptions()
 
 		if (optionButtons.length === 0) return
 
@@ -59,9 +61,7 @@ export class QuizNavigator {
 	}
 
 	clickCurrent(): boolean {
-		const optionButtons = $$<HTMLButtonElement>(
-			PLATZI_QUIZ_SELECTORS.QUIZ_OPTIONS,
-		)
+		const optionButtons = this.getQuizOptions()
 
 		if (this.isValidSelection(optionButtons.length)) {
 			optionButtons[this.selectedIndex].click()
@@ -79,9 +79,7 @@ export class QuizNavigator {
 
 	cancel(): void {
 		this.selectedIndex = -1
-		const optionButtons = $$<HTMLButtonElement>(
-			PLATZI_QUIZ_SELECTORS.QUIZ_OPTIONS,
-		)
+		const optionButtons = this.getQuizOptions()
 		optionButtons.forEach((btn) => {
 			clearOutline(btn)
 		})
@@ -89,9 +87,7 @@ export class QuizNavigator {
 	}
 
 	cycleMark(direction: "forward" | "backward"): void {
-		const optionButtons = $$<HTMLButtonElement>(
-			PLATZI_QUIZ_SELECTORS.QUIZ_OPTIONS,
-		)
+		const optionButtons = this.getQuizOptions()
 
 		if (!this.isValidSelection(optionButtons.length)) return
 
@@ -151,9 +147,7 @@ export class QuizNavigator {
 	}
 
 	clearAllMarkStates(): void {
-		const optionButtons = $$<HTMLButtonElement>(
-			PLATZI_QUIZ_SELECTORS.QUIZ_OPTIONS,
-		)
+		const optionButtons = this.getQuizOptions()
 
 		this.markStateManager.getMarkedIndices().forEach((index) => {
 			const btn = optionButtons[index]
