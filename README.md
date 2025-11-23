@@ -8,6 +8,23 @@ WebKey eliminates the need to use your mouse by providing keyboard shortcuts for
 
 ## Keyboard Shortcuts
 
+### Global (All Websites)
+
+| Shortcut | Action |
+|----------|--------|
+| `⌘+Shift+H` (Mac) / `Ctrl+Shift+H` (Windows) | Go to website home page |
+
+#### Custom Home Configuration
+
+You can configure custom "home" pages for specific websites:
+
+1. Click the WebKey extension icon in your browser toolbar
+2. Add domain → URL mappings (e.g., `github.com` → `https://github.com/dashboard`)
+3. When you press the shortcut on that domain, it will go to your custom URL
+4. If no custom home is configured, it falls back to the domain root (`/`)
+
+This allows you to set "home" to be your personal dashboard, profile page, or any frequently visited page on each website.
+
 ### Gmail (`mail.google.com`)
 
 | Shortcut | Action |
