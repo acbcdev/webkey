@@ -1,3 +1,4 @@
+import tailwindcss from "@tailwindcss/vite"
 import { defineConfig } from "wxt"
 
 // See https://wxt.dev/api/config.html
@@ -10,7 +11,10 @@ export default defineConfig({
 		version: "1.0.0",
 		author: { email: "acbc.dev@gmail.com" },
 		homepage_url: "https://github.com/acbcdev/webkey",
-		permissions: ["clipboardWrite"],
+		permissions: ["clipboardWrite", "storage"],
+		action: {
+			default_popup: "popup.html",
+		},
 		icons: {
 			16: "/icon/16.png",
 			32: "/icon/32.png",
@@ -19,5 +23,9 @@ export default defineConfig({
 			128: "/icon/128.png",
 		},
 	},
+
 	srcDir: "src",
+	vite: () => ({
+		plugins: [tailwindcss()],
+	}),
 })
