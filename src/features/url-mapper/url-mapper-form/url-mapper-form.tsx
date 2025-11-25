@@ -1,7 +1,12 @@
 import { Plus } from "lucide-react"
 import { useEffect, useState } from "react"
-import { Button } from "@/features/ui/button"
-import { Input } from "@/features/ui/input"
+import {
+	InputGroup,
+	InputGroupAddon,
+	InputGroupButton,
+	InputGroupInput,
+	InputGroupText,
+} from "@/features/ui/input-group"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/features/ui/tooltip"
 
 interface UrlMapperFormProps {
@@ -27,31 +32,24 @@ export function UrlMapperForm({ defaultPath, onAdd }: UrlMapperFormProps) {
 	}
 
 	return (
-		<div className="flex gap-2">
-			<div className="relative flex-1 flex items-center">
-				<span className="absolute left-3 text-muted-foreground select-none">
-					/
-				</span>
-				<Input
-					value={pathInput}
-					onChange={(e) => setPathInput(e.target.value)}
-					// placeholder="current-path"
-					className="w-full bg-muted/50 border-none focus-visible:ring-1 focus-visible:ring-ring pl-6"
-				/>
-			</div>
-			<Tooltip>
-				<TooltipTrigger asChild>
-					<Button
-						size="icon"
-						variant="secondary"
-						onClick={handleAdd}
-						className="shrink-0 rounded-l-none -ml-2 z-10"
-					>
-						<Plus className="size-4" />
-					</Button>
-				</TooltipTrigger>
-				<TooltipContent>Add current path</TooltipContent>
-			</Tooltip>
-		</div>
+		<InputGroup className="flex-1">
+			<InputGroupAddon align="inline-start">
+				<InputGroupText>/</InputGroupText>
+			</InputGroupAddon>
+			<InputGroupInput
+				value={pathInput}
+				onChange={(e) => setPathInput(e.target.value)}
+			/>
+			<InputGroupAddon align="inline-end">
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<InputGroupButton size="icon-sm" onClick={handleAdd}>
+							<Plus className="size-4" />
+						</InputGroupButton>
+					</TooltipTrigger>
+					<TooltipContent>Add current path</TooltipContent>
+				</Tooltip>
+			</InputGroupAddon>
+		</InputGroup>
 	)
 }
