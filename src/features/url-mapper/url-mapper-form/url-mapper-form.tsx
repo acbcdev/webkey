@@ -32,9 +32,9 @@ export function UrlMapperForm({ defaultPath, onAdd }: UrlMapperFormProps) {
 	}
 
 	return (
-		<InputGroup className="flex-1">
+		<InputGroup className="flex-1 has-[>[data-align=inline-start]]:[&>input]:pl-px">
 			<InputGroupAddon align="inline-start">
-				<InputGroupText>/</InputGroupText>
+				<InputGroupText className="text-lg">/</InputGroupText>
 			</InputGroupAddon>
 			<InputGroupInput
 				value={pathInput}
