@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { ScrollArea } from "@/features/ui/scroll-area"
 import { UrlMapperForm } from "../url-mapper-form"
 import { UrlMapperList } from "../url-mapper-list"
 import { useCurrentTab } from "../use-current-tab"
@@ -42,7 +43,7 @@ export function UrlMapperManager() {
 		}
 	}
 
-	const handleEdit = (mapping: UrlMapperMapping) => {
+	const handleEdit = async (mapping: UrlMapperMapping) => {
 		try {
 			const url = new URL(mapping.url)
 			setTargetDomain(mapping.domain)
@@ -54,13 +55,17 @@ export function UrlMapperManager() {
 	}
 
 	return (
-		<div className="w-[600px] bg-background text-foreground p-4 flex flex-col gap-4">
-			<UrlMapperForm defaultPath={formDefaultPath} onAdd={handleAdd} />
-			<UrlMapperList
-				mappings={mappings}
-				onDelete={removeMapping}
-				onEdit={handleEdit}
-			/>
+		<div className="w-[480px] h-[450px] bg-background text-foreground py-4 px-2 flex flex-col gap-4">
+			<div className="shrink-0">
+				<UrlMapperForm defaultPath={formDefaultPath} onAdd={handleAdd} />
+			</div>
+			<ScrollArea className="flex-1 h-96 w-full">
+				<UrlMapperList
+					mappings={mappings}
+					onDelete={removeMapping}
+					onEdit={handleEdit}
+				/>
+			</ScrollArea>
 		</div>
 	)
 }
