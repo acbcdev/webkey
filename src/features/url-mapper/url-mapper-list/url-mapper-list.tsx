@@ -44,7 +44,7 @@ export function UrlMapperList({
 		await onEdit({
 			domain,
 			url,
-			displayUrl: url.length > 60 ? url.substring(0, 57) + "..." : url,
+			displayUrl: url.length > 60 ? `${url.substring(0, 57)}...` : url,
 		})
 		setEditingMapping(null)
 	}
