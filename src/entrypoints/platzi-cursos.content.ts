@@ -19,9 +19,7 @@ export default defineContentScript({
 			const target = event.target
 
 			// Check if the clicked element or its parent has class containing "Articlass__content"
-			const contentElement = target.closest(
-				PLATZI_CURSOS_SELECTORS.CONTENT,
-			)
+			const contentElement = target.closest(PLATZI_CURSOS_SELECTORS.CONTENT)
 
 			if (contentElement instanceof HTMLElement) {
 				copyElementText(contentElement)

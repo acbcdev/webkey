@@ -5,9 +5,17 @@ import {
 	setCustomHomeUrl,
 } from "@/lib/storage/home-urls"
 
+function shortenUrl(url: string, maxLength: number = 40): string {
+	if (url.length <= maxLength) {
+		return url
+	}
+	return `${url.substring(0, maxLength - 3)}...`
+}
+
 export interface UrlMapperMapping {
 	domain: string
 	url: string
+	displayUrl: string
 }
 
 export function useUrlMapper() {
@@ -15,7 +23,13 @@ export function useUrlMapper() {
 
 	const loadMappings = useCallback(async () => {
 		const urls = await getCustomHomeUrls()
-		setMappings(Object.entries(urls).map(([domain, url]) => ({ domain, url })))
+		setMappings(
+			Object.entries(urls).map(([domain, url]) => ({
+				domain,
+				url,
+				displayUrl: shortenUrl(url),
+			})),
+		)
 	}, [])
 
 	useEffect(() => {

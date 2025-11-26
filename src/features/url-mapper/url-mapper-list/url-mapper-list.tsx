@@ -41,12 +41,16 @@ export function UrlMapperList({
 	}
 
 	const handleEditSave = async (domain: string, url: string) => {
-		await onEdit({ domain, url })
+		await onEdit({
+			domain,
+			url,
+			displayUrl: url.length > 60 ? url.substring(0, 57) + "..." : url,
+		})
 		setEditingMapping(null)
 	}
 
 	return (
-		<div className="flex flex-col gap-2 p-4">
+		<div className="flex flex-col gap-2 p-4 ">
 			<ItemGroup>
 				{mappings.map((mapping) => (
 					<Item
@@ -62,10 +66,10 @@ export function UrlMapperList({
 						<ItemContent>
 							<ItemTitle>{mapping.domain}</ItemTitle>
 							<ItemDescription
-								className=" truncate line-clamp-1"
+								className="line-clamp-1 overflow-hidden"
 								title={mapping.url}
 							>
-								{mapping.url}
+								{mapping.displayUrl}
 							</ItemDescription>
 						</ItemContent>
 						<ItemActions>
