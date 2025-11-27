@@ -170,3 +170,8 @@
 		@apply bg-background text-foreground;
 	}
 }
+
+body {
+	width: 450px;
+	height: 600px;
+}
