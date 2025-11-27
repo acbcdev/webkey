@@ -55,7 +55,7 @@ export function UrlMapperManager() {
 	}
 
 	return (
-		<div className="w-[480px] h-[450px] bg-background text-foreground py-4 px-2 flex flex-col gap-4">
+		<div className=" bg-background text-foreground py-4 px-2 flex flex-col gap-4">
 			<div className="shrink-0">
 				<UrlMapperForm defaultPath={formDefaultPath} onAdd={handleAdd} />
 			</div>
