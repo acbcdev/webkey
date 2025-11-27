@@ -44,7 +44,8 @@ export function ConfigPanelManager() {
 			<div className="px-2">
 				<h2 className="text-lg font-semibold">Feature Configuration</h2>
 				<p className="text-sm text-muted-foreground">
-					Enable or disable shortcuts. Refresh the page for changes to take effect.
+					Enable or disable shortcuts. Refresh the page for changes to take
+					effect.
 				</p>
 			</div>
 
