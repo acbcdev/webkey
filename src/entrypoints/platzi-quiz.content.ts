@@ -9,6 +9,7 @@ import {
 } from "@/features/platzi/quiz/constants"
 import { QuizNavigator } from "@/features/platzi/quiz/QuizNavigator"
 import { $, $$ } from "@/lib/dom/query"
+import { featureConfig } from "@/lib/storage/feature-config"
 
 /**
  * Helper function to select a quiz option and cancel any previous selection
@@ -42,8 +43,13 @@ export default defineContentScript({
 		"*://*.platzi.com/clases/examen/*",
 		"*://*.platzi.com/clases/quiz/*",
 	],
-	main() {
+	async main() {
 		console.log("Platzi: Quiz content script loaded")
+		const config = await featureConfig.getValue()
+
+		// Exit early if feature is disabled
+		if (!config.platziQuiz) return
+
 		const navigator = new QuizNavigator()
 
 		// Arrow key navigation for quiz options
