@@ -43,7 +43,7 @@ export function UrlMapperForm({ defaultPath, onAdd }: UrlMapperFormProps) {
 			<InputGroupAddon align="inline-end">
 				<Tooltip>
 					<TooltipTrigger asChild>
-						<InputGroupButton size="icon-sm" onClick={handleAdd}>
+						<InputGroupButton size="icon-xs" onClick={handleAdd}>
 							<Plus className="size-4" />
 						</InputGroupButton>
 					</TooltipTrigger>
