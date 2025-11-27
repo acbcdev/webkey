@@ -27,12 +27,9 @@ const DEFAULT_CONFIG: FeatureConfig = {
  */
 const STORAGE_KEY = "local:featureConfig"
 
-export const featureConfig = storage.defineItem<FeatureConfig>(
-	STORAGE_KEY,
-	{
-		defaultValue: DEFAULT_CONFIG,
-	},
-)
+export const featureConfig = storage.defineItem<FeatureConfig>(STORAGE_KEY, {
+	defaultValue: DEFAULT_CONFIG,
+})
 
 /**
  * Get all feature configurations
