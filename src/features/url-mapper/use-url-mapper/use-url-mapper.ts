@@ -32,19 +32,13 @@ export function useUrlMapper() {
 		[urls],
 	)
 
-	const addMapping = useCallback(
-		async (domain: string, url: string) => {
-			await setCustomHomeUrl(domain, url)
-		},
-		[],
-	)
+	const addMapping = useCallback(async (domain: string, url: string) => {
+		await setCustomHomeUrl(domain, url)
+	}, [])
 
-	const removeMapping = useCallback(
-		async (domain: string) => {
-			await removeCustomHomeUrl(domain)
-		},
-		[],
-	)
+	const removeMapping = useCallback(async (domain: string) => {
+		await removeCustomHomeUrl(domain)
+	}, [])
 
 	return {
 		mappings,
