@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useMemo } from "react"
+import { useStore } from "@/lib/hooks"
 import {
-	getCustomHomeUrls,
+	customHomeUrls,
 	removeCustomHomeUrl,
 	setCustomHomeUrl,
 } from "@/lib/storage/home-urls"
@@ -19,43 +20,35 @@ export interface UrlMapperMapping {
 }
 
 export function useUrlMapper() {
-	const [mappings, setMappings] = useState<UrlMapperMapping[]>([])
+	const [urls] = useStore(customHomeUrls)
 
-	const loadMappings = useCallback(async () => {
-		const urls = await getCustomHomeUrls()
-		setMappings(
-			Object.entries(urls).map(([domain, url]) => ({
+	const mappings = useMemo(
+		() =>
+			Object.entries(urls as Record<string, string>).map(([domain, url]) => ({
 				domain,
 				url,
 				displayUrl: shortenUrl(url),
 			})),
-		)
-	}, [])
-
-	useEffect(() => {
-		loadMappings()
-	}, [loadMappings])
+		[urls],
+	)
 
 	const addMapping = useCallback(
 		async (domain: string, url: string) => {
 			await setCustomHomeUrl(domain, url)
-			await loadMappings()
 		},
-		[loadMappings],
+		[],
 	)
 
 	const removeMapping = useCallback(
 		async (domain: string) => {
 			await removeCustomHomeUrl(domain)
-			await loadMappings()
 		},
-		[loadMappings],
+		[],
 	)
 
 	return {
 		mappings,
 		addMapping,
 		removeMapping,
-		refreshMappings: loadMappings,
 	}
 }
