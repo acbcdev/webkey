@@ -6,11 +6,17 @@ import {
 	PLATZI_CURSOS_SHORTCUTS,
 } from "@/features/platzi/content-copy"
 import { copyElementText } from "@/lib/dom/clipboard"
+import { featureConfig } from "@/lib/storage/feature-config"
 
 export default defineContentScript({
 	matches: ["*://*.platzi.com/cursos/*"],
-	main() {
+	async main() {
 		console.log("Platzi: Cursos content script loaded")
+
+		const config = await featureConfig.getValue()
+
+		// Exit early if feature is disabled
+		if (!config.platziCursos) return
 
 		// Double-click event listener for content class
 		const handleDblClick = (event: Event) => {
@@ -28,11 +34,6 @@ export default defineContentScript({
 
 		document.addEventListener("dblclick", handleDblClick)
 
-		// Cleanup listener on unload to prevent memory leaks
-		window.addEventListener("unload", () => {
-			document.removeEventListener("dblclick", handleDblClick)
-		})
-
 		// Press 'h' to copy the first h1 element
 		hotkeys(PLATZI_CURSOS_SHORTCUTS.COPY_HEADING, () => {
 			copyHeading()
@@ -41,6 +42,11 @@ export default defineContentScript({
 		// Press 'r' to copy the resume content
 		hotkeys(PLATZI_CURSOS_SHORTCUTS.COPY_CONTENT, () => {
 			copyContent()
+		})
+
+		// Cleanup listener on unload to prevent memory leaks
+		window.addEventListener("unload", () => {
+			document.removeEventListener("dblclick", handleDblClick)
 		})
 	},
 })
