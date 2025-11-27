@@ -6,10 +6,16 @@ import {
 	navigateToNewer,
 	navigateToOlder,
 } from "@/features/gmail/navigation"
+import { featureConfig } from "@/lib/storage/feature-config"
 
 export default defineContentScript({
 	matches: ["*://mail.google.com/*"],
-	main() {
+	async main() {
+		const config = await featureConfig.getValue()
+
+		// Exit early if feature is disabled
+		if (!config.gmail) return
+
 		// Left arrow or '<' for newer email
 		hotkeys(GMAIL_SHORTCUTS.NEWER, () => {
 			navigateToNewer()
