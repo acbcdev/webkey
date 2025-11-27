@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react"
 import type { WxtStorageItem } from "@wxt-dev/storage"
+import { useEffect, useState } from "react"
 
 /**
  * Generic hook for reactive access to WXT storage items
