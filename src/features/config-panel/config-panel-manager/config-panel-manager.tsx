@@ -33,6 +33,11 @@ export function ConfigPanelManager() {
 			description: "Gallery item creation shortcuts",
 		},
 		{
+			key: "chatgpt" as const,
+			label: "ChatGPT",
+			description: "Copy last response to clipboard (Alt+C)",
+		},
+		{
 			key: "global" as const,
 			label: "Global Shortcuts",
 			description: "Custom home navigation (Ctrl/Cmd+Shift+H)",
