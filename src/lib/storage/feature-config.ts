@@ -11,6 +11,7 @@ export interface FeatureConfig {
 	platziCursos: boolean
 	notion: boolean
 	global: boolean
+	chatgpt: boolean
 }
 
 const DEFAULT_CONFIG: FeatureConfig = {
@@ -20,6 +21,7 @@ const DEFAULT_CONFIG: FeatureConfig = {
 	platziCursos: true,
 	notion: true,
 	global: true,
+	chatgpt: true,
 }
 
 /**
