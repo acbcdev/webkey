@@ -3,8 +3,8 @@
  */
 
 import { $$ } from "@/lib/dom/query"
-import { flashBackground } from "@/lib/ui/visual-feedback"
 import { VISUAL } from "@/lib/ui/colors"
+import { flashBackground } from "@/lib/ui/visual-feedback"
 import { CHATGPT_SELECTORS } from "./constants"
 
 /**
