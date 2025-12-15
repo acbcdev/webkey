@@ -1,6 +1,7 @@
 import hotkeys from "hotkeys-js"
 import {
 	clickLastControlBarButton,
+	clickLastEvaluateButton,
 	findAndClickButton,
 } from "@/features/platzi/quiz/button-handler"
 import {
@@ -42,6 +43,7 @@ export default defineContentScript({
 	matches: [
 		"*://*.platzi.com/clases/examen/*",
 		"*://*.platzi.com/clases/quiz/*",
+		"*://*.platzi.com/evaluacion/*",
 	],
 	async main() {
 		console.log("Platzi: Quiz content script loaded")
@@ -72,8 +74,11 @@ export default defineContentScript({
 				return
 			}
 
-			// Try clicking control buttons - check ControlBar first, then other buttons
-			const clicked = clickLastControlBarButton() || !!findAndClickButton()
+			// Try clicking control buttons - check ControlBar first, then Evaluate, then other buttons
+			const clicked =
+				clickLastControlBarButton() ||
+				clickLastEvaluateButton() ||
+				!!findAndClickButton()
 			if (!clicked) {
 				console.warn("Platzi: No button found to click")
 			}
@@ -98,8 +103,10 @@ export default defineContentScript({
 		hotkeys(PLATZI_QUIZ_SHORTCUTS.SELECT_BY_LETTER, (event) => {
 			selectOptionBy(
 				(button) => {
+					// Old UI: letter in .QuestionOption-letter-span
+					// New UI: letter is direct button text content
 					const letterSpan = $(PLATZI_QUIZ_SELECTORS.OPTION_LETTER, button)
-					return letterSpan?.textContent?.toLowerCase() === event.key
+					return letterSpan?.textContent?.trim().toLowerCase() === event.key
 				},
 				`Platzi: Selected option ${event.key.toUpperCase()}`,
 				navigator,
