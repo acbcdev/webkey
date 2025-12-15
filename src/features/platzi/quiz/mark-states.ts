@@ -65,10 +65,16 @@ function applyMarkState({
 		})
 
 		// Hide the letter text with opacity (the actual letter like A, B, C, D)
+		// Old UI: letter is in nested span; New UI: letter is direct text in button
 		const letterText = letter.querySelector("span")
 		if (letterText) {
+			// Old UI: hide the span
 			letterText.style.opacity = "0"
 			letterText.style.transition = "opacity 300ms ease-in-out"
+		} else {
+			// New UI: hide direct text with color
+			letter.style.color = "transparent"
+			letter.style.transition = "color 300ms ease-in-out"
 		}
 
 		// Inject SVG icon into letter box
@@ -187,11 +193,17 @@ export function clearMarkState(
 		icons.forEach((icon) => {
 			icon.remove()
 		})
-		// Restore letter text opacity
+		// Restore letter text visibility
+		// Old UI: restore span opacity; New UI: restore button text color
 		const letterText = letter.querySelector("span")
 		if (letterText) {
+			// Old UI
 			letterText.style.opacity = ""
 			letterText.style.transition = ""
+		} else {
+			// New UI
+			letter.style.color = ""
+			letter.style.transition = ""
 		}
 	}
 	if (text) text.style.textDecoration = ""
