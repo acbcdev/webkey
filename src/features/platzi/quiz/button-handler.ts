@@ -66,3 +66,28 @@ export function clickLastControlBarButton(): boolean {
 	}
 	return false
 }
+
+/**
+ * Special handler for new UI evaluate button - clicks the last button with data-id
+ * The last button is typically "Evaluar" (Evaluate), not "Saltar" (Skip)
+ * @returns true if a button was clicked, false otherwise
+ */
+export function clickLastEvaluateButton(): boolean {
+	const buttons = $$<HTMLButtonElement>(
+		'button[data-id="atomic-ui-button-layout"]:not([disabled])',
+	)
+
+	if (buttons.length > 0) {
+		const lastButton = buttons[buttons.length - 1]
+
+		try {
+			lastButton.click()
+			console.log("Platzi: Clicked last Evaluate button")
+			return true
+		} catch (error) {
+			console.error("Platzi: Failed to click Evaluate button:", error)
+			return false
+		}
+	}
+	return false
+}
