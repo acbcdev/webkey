@@ -3,12 +3,21 @@
  */
 
 export const PLATZI_QUIZ_SELECTORS = {
-	QUIZ_OPTIONS: 'button[data-testid="QuestionOption-content"]',
-	OPTION_LETTER: ".QuestionOption-letter-span",
-	OPTION_LETTER_ELEMENT: ".QuestionOption-letter",
-	OPTION_TEXT_ELEMENT: ".QuestionOption-text",
+	// Combined selectors for old UI and new UI (evaluacion pages)
+	QUIZ_OPTIONS:
+		'button[data-testid="QuestionOption-content"], label[data-id="answer-option"]',
+	OPTION_LETTER:
+		'.QuestionOption-letter-span, label[data-id="answer-option"] > button',
+	OPTION_LETTER_ELEMENT:
+		'.QuestionOption-letter, label[data-id="answer-option"] > button',
+	OPTION_TEXT_ELEMENT:
+		'.QuestionOption-text, label[data-id="answer-option"] > span',
+
+	// Button selectors
 	CONTROL_BAR: ".ControlBar-content",
 	CONTROL_BUTTONS: "button:not([disabled])",
+	EVALUATE_BUTTON:
+		'button[class*="Controllers_evaluateButton"]:not([disabled])',
 	START_EXAM_BUTTON: 'button[data-trans="StartExam.cta.takeTest"]',
 	START_QUIZ_BUTTON: 'button[maintext="StartQuiz.cta.takeTest"]',
 	FINISH_BUTTON: 'button[testid="ControlBar-button-finish"]',
