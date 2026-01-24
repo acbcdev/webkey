@@ -8,5 +8,5 @@ export const CHATGPT_SELECTORS = {
 } as const
 
 export const CHATGPT_SHORTCUTS = {
-	COPY_LAST_RESPONSE: "alt+c",
+	COPY_LAST_RESPONSE: "shift+alt+c",
 } as const
