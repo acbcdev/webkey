@@ -35,7 +35,7 @@ export function ConfigPanelManager() {
 		{
 			key: "chatgpt" as const,
 			label: "ChatGPT",
-			description: "Copy last response to clipboard (Alt+C)",
+			description: "Copy last response to clipboard (Shift+Alt+C)",
 		},
 		{
 			key: "global" as const,
