@@ -4,25 +4,28 @@
 
 import { getCustomHomeUrl } from "@/lib/storage/home-urls"
 
-/**
- * Navigate to the home page of the current website
- * Checks for custom home URL first, falls back to domain root
- */
+async function resolveHomeUrl(): Promise<string> {
+	const customUrl = await getCustomHomeUrl(window.location.hostname)
+	return customUrl || window.location.origin
+}
+
 export async function goToHome(): Promise<void> {
 	try {
-		const currentDomain = window.location.hostname
-		const customUrl = await getCustomHomeUrl(currentDomain)
+		const url = await resolveHomeUrl()
 		const a = document.createElement("a")
-		a.href = customUrl || window.location.origin
+		a.href = url
 		a.click()
-		// if (customUrl) {
-		// 	window.location.href = customUrl
-		// } else {
-		// 	window.location.href = window.location.origin
-		// }
 	} catch (error) {
 		console.error("Failed to navigate to home:", error)
-		// Fallback to domain root
 		window.location.href = window.location.origin
+	}
+}
+
+export async function openHomeInNewTab(): Promise<void> {
+	try {
+		window.open(await resolveHomeUrl(), "_blank")
+	} catch (error) {
+		console.error("Failed to open home in new tab:", error)
+		window.open(window.location.origin, "_blank")
 	}
 }
