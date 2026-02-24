@@ -30,6 +30,38 @@ export async function flashBackground(
 }
 
 /**
+ * Show a temporary toast notification in the corner of the viewport
+ * @param message - Text to display
+ * @param duration - Duration in milliseconds before fading out (defaults to 1500ms)
+ */
+export function toast(message: string, duration: number = 1500): void {
+	const el = document.createElement("div")
+	el.textContent = message
+	Object.assign(el.style, {
+		position: "fixed",
+		bottom: "24px",
+		right: "24px",
+		padding: "10px 16px",
+		background: VISUAL.FEEDBACK_COLOR,
+		color: "#fff",
+		borderRadius: "8px",
+		fontSize: "14px",
+		fontWeight: "600",
+		zIndex: "2147483647",
+		opacity: "1",
+		transition: `opacity ${VISUAL.TRANSITION_DURATION}ms`,
+		pointerEvents: "none",
+	})
+
+	document.body.appendChild(el)
+
+	setTimeout(() => {
+		el.style.opacity = "0"
+		setTimeout(() => el.remove(), VISUAL.TRANSITION_DURATION)
+	}, duration)
+}
+
+/**
  * Flash element outline with color animation
  * @param element - Element to highlight
  * @param color - Outline color (defaults to success green)

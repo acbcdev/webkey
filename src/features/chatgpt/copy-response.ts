@@ -3,8 +3,7 @@
  */
 
 import { $$ } from "@/lib/dom/query"
-import { VISUAL } from "@/lib/ui/colors"
-import { flashBackground } from "@/lib/ui/visual-feedback"
+import { toast } from "@/lib/ui/visual-feedback"
 import { CHATGPT_SELECTORS } from "./constants"
 
 /**
@@ -24,11 +23,7 @@ export function copyLastResponse(): boolean {
 
 	try {
 		lastButton.click()
-
-		// Visual feedback: flash button background green
-		flashBackground(lastButton, VISUAL.FEEDBACK_COLOR, 300)
-
-		console.log("ChatGPT: Clicked last copy button (most recent response)")
+		toast("Copied!")
 		return true
 	} catch (error) {
 		console.error("ChatGPT: Failed to click copy button:", error)

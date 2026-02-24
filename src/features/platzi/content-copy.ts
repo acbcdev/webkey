@@ -2,8 +2,9 @@
  * Platzi course content copying functionality
  */
 
-import { copyElementText } from "@/lib/dom/clipboard"
+import { copyText } from "@/lib/dom/clipboard"
 import { $ } from "@/lib/dom/query"
+import { toast } from "@/lib/ui/visual-feedback"
 
 export const PLATZI_CURSOS_SELECTORS = {
 	CONTENT: '[class*="Articlass__content"]',
@@ -18,19 +19,18 @@ export const PLATZI_CURSOS_SHORTCUTS = {
 /**
  * Copy course content heading (h1)
  */
-export function copyHeading(): void {
+export async function copyHeading(): Promise<void> {
 	const h1Element = $<HTMLElement>(PLATZI_CURSOS_SELECTORS.HEADING_H1)
 	if (h1Element) {
-		copyElementText(h1Element)
+		await copyText(h1Element.innerText || h1Element.textContent || "")
+		toast("Heading copied!")
 	}
 }
 
-/**
- * Copy course content section
- */
-export function copyContent(): void {
+export async function copyContent(): Promise<void> {
 	const contentElement = $<HTMLElement>(PLATZI_CURSOS_SELECTORS.CONTENT)
 	if (contentElement) {
-		copyElementText(contentElement)
+		await copyText(contentElement.innerText || contentElement.textContent || "")
+		toast("Content copied!")
 	}
 }

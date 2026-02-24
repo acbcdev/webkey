@@ -5,8 +5,9 @@ import {
 	PLATZI_CURSOS_SELECTORS,
 	PLATZI_CURSOS_SHORTCUTS,
 } from "@/features/platzi/content-copy"
-import { copyElementText } from "@/lib/dom/clipboard"
+import { copyText } from "@/lib/dom/clipboard"
 import { featureConfig } from "@/lib/storage/feature-config"
+import { toast } from "@/lib/ui/visual-feedback"
 
 export default defineContentScript({
 	matches: ["*://*.platzi.com/cursos/*"],
@@ -28,7 +29,7 @@ export default defineContentScript({
 			const contentElement = target.closest(PLATZI_CURSOS_SELECTORS.CONTENT)
 
 			if (contentElement instanceof HTMLElement) {
-				copyElementText(contentElement)
+				copyText(contentElement.innerText || contentElement.textContent || "").then(() => toast("Content copied!"))
 			}
 		}
 
