@@ -4,7 +4,31 @@
  * For quiz-specific visual styling, see features/platzi/quiz/mark-states.ts
  */
 
+import {
+	type ToastPosition,
+	type ToastSize,
+	toastConfig,
+} from "@/lib/storage/toast-config"
 import { VISUAL } from "./colors"
+
+const POSITION_STYLES: Record<ToastPosition, Partial<CSSStyleDeclaration>> = {
+	"bottom-right": { bottom: "24px", right: "24px" },
+	"bottom-left": { bottom: "24px", left: "24px" },
+	"top-right": { top: "24px", right: "24px" },
+	"top-left": { top: "24px", left: "24px" },
+	"top-center": { top: "24px", left: "50%", transform: "translateX(-50%)" },
+	"bottom-center": {
+		bottom: "24px",
+		left: "50%",
+		transform: "translateX(-50%)",
+	},
+}
+
+const SIZE_STYLES: Record<ToastSize, { padding: string; fontSize: string }> = {
+	sm: { padding: "6px 12px", fontSize: "12px" },
+	md: { padding: "10px 16px", fontSize: "14px" },
+	lg: { padding: "14px 20px", fontSize: "16px" },
+}
 
 /**
  * Flash element background with color animation
@@ -35,30 +59,34 @@ export async function flashBackground(
  * @param duration - Duration in milliseconds before fading out (defaults to 1500ms)
  */
 export function toast(message: string, duration: number = 1500): void {
-	const el = document.createElement("div")
-	el.textContent = message
-	Object.assign(el.style, {
-		position: "fixed",
-		bottom: "24px",
-		right: "24px",
-		padding: "10px 16px",
-		background: VISUAL.FEEDBACK_COLOR,
-		color: "#fff",
-		borderRadius: "8px",
-		fontSize: "14px",
-		fontWeight: "600",
-		zIndex: "2147483647",
-		opacity: "1",
-		transition: `opacity ${VISUAL.TRANSITION_DURATION}ms`,
-		pointerEvents: "none",
+	toastConfig.getValue().then((config) => {
+		const el = document.createElement("div")
+		el.textContent = message
+
+		const positionStyle = POSITION_STYLES[config.position]
+		const sizeStyle = SIZE_STYLES[config.size]
+
+		Object.assign(el.style, {
+			position: "fixed",
+			...positionStyle,
+			...sizeStyle,
+			background: VISUAL.FEEDBACK_COLOR,
+			color: "#fff",
+			borderRadius: "8px",
+			fontWeight: "600",
+			zIndex: "2147483647",
+			opacity: "1",
+			transition: `opacity ${VISUAL.TRANSITION_DURATION}ms`,
+			pointerEvents: "none",
+		})
+
+		document.body.appendChild(el)
+
+		setTimeout(() => {
+			el.style.opacity = "0"
+			setTimeout(() => el.remove(), VISUAL.TRANSITION_DURATION)
+		}, duration)
 	})
-
-	document.body.appendChild(el)
-
-	setTimeout(() => {
-		el.style.opacity = "0"
-		setTimeout(() => el.remove(), VISUAL.TRANSITION_DURATION)
-	}, duration)
 }
 
 /**
