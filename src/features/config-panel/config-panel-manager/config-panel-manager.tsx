@@ -109,17 +109,12 @@ export function ConfigPanelManager() {
 						<div key={feature.key}>
 							{index > 0 && <Separator className="my-4" />}
 							<div className="flex items-center justify-between gap-4">
-								<div className="flex-1">
-									<label
-										htmlFor={feature.key}
-										className="text-sm font-medium cursor-pointer"
-									>
-										{feature.label}
-									</label>
+								<label htmlFor={feature.key} className="flex-1 cursor-pointer">
+									<span className="text-sm font-medium">{feature.label}</span>
 									<p className="text-xs text-muted-foreground mt-1">
 										{feature.description}
 									</p>
-								</div>
+								</label>
 								<Switch
 									id={feature.key}
 									checked={
