@@ -29,7 +29,9 @@ export default defineContentScript({
 			const contentElement = target.closest(PLATZI_CURSOS_SELECTORS.CONTENT)
 
 			if (contentElement instanceof HTMLElement) {
-				copyText(contentElement.innerText || contentElement.textContent || "").then(() => toast("Content copied!"))
+				copyText(
+					contentElement.innerText || contentElement.textContent || "",
+				).then(() => toast("Content copied!"))
 			}
 		}
 
