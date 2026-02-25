@@ -15,7 +15,9 @@ export default defineContentScript({
 		// fire even when focus is inside inputs, textareas, or selects
 		hotkeys.filter = (event) => {
 			const tag = (event.target as HTMLElement).tagName
-			hotkeys.setScope(/^(INPUT|TEXTAREA|SELECT)$/.test(tag) ? "input" : "other")
+			hotkeys.setScope(
+				/^(INPUT|TEXTAREA|SELECT)$/.test(tag) ? "input" : "other",
+			)
 			return true
 		}
 
@@ -28,6 +30,11 @@ export default defineContentScript({
 		hotkeys(GLOBAL_SHORTCUTS.OPEN_HOME_NEW_TAB, "all", (event) => {
 			event.preventDefault()
 			openHomeInNewTab().catch(console.error)
+		})
+
+		hotkeys(GLOBAL_SHORTCUTS.OPEN_CURRENT_NEW_TAB, "all", (event) => {
+			event.preventDefault()
+			window.open(window.location.href, "_blank")
 		})
 	},
 })
