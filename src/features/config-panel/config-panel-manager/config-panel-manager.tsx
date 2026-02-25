@@ -149,7 +149,10 @@ export function ConfigPanelManager() {
 									key={key}
 									className="flex items-center justify-between gap-4"
 								>
-									<label htmlFor={`toast-${key}`} className="text-sm text-muted-foreground">
+									<label
+										htmlFor={`toast-${key}`}
+										className="text-sm text-muted-foreground"
+									>
 										{label}
 									</label>
 									<Select
