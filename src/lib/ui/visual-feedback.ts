@@ -73,6 +73,7 @@ export function toast(message: string, duration: number = 1500): void {
 			background: VISUAL.FEEDBACK_COLOR,
 			color: "#fff",
 			borderRadius: "8px",
+			fontFamily: "system-ui, -apple-system, sans-serif",
 			fontWeight: "600",
 			zIndex: "2147483647",
 			opacity: "1",
