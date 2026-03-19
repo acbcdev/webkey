@@ -12,7 +12,7 @@ export default defineConfig({
 		version: "1.0.0",
 		author: { email: "acbc.dev@gmail.com" },
 		homepage_url: "https://github.com/acbcdev/webkey",
-		permissions: ["clipboardWrite", "storage", "activeTab", "scripting"],
+		permissions: ["storage", "activeTab"],
 		action: {
 			default_popup: "popup.html",
 		},
