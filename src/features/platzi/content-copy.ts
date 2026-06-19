@@ -7,7 +7,7 @@ import { $ } from "@/lib/dom/query"
 import { toast } from "@/lib/ui/visual-feedback"
 
 export const PLATZI_CURSOS_SELECTORS = {
-	CONTENT: '[class*="Articlass__content"]',
+	CONTENT: '[class*="Resources__summary"]',
 	HEADING_H1: "h1",
 } as const
 
