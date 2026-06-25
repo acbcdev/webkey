@@ -37,5 +37,8 @@
       "allowWrongLineComments": true,
       "tailwindDirectives": true
     }
+  },
+  "files": {
+    "ignoreUnknown": true
   }
 }
