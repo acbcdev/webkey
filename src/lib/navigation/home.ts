@@ -29,36 +29,3 @@ export async function openHomeInNewTab(): Promise<void> {
 		window.open(window.location.origin, "_blank")
 	}
 }
-
-// Background-compatible versions (no window/document access)
-
-async function getActiveTab(): Promise<browser.tabs.Tab | null> {
-	const [tab] = await browser.tabs.query({ active: true, currentWindow: true })
-	return tab ?? null
-}
-
-async function resolveHomeUrlForTab(tabUrl: string): Promise<string> {
-	const { hostname, origin } = new URL(tabUrl)
-	const customUrl = await getCustomHomeUrl(hostname)
-	return customUrl ?? origin
-}
-
-export async function goToHomeBackground(): Promise<void> {
-	const tab = await getActiveTab()
-	if (!tab?.url || !tab.id) return
-	const url = await resolveHomeUrlForTab(tab.url)
-	await browser.tabs.update(tab.id, { url })
-}
-
-export async function openHomeInNewTabBackground(): Promise<void> {
-	const tab = await getActiveTab()
-	if (!tab?.url) return
-	const url = await resolveHomeUrlForTab(tab.url)
-	await browser.tabs.create({ url })
-}
-
-export async function openCurrentInNewTabBackground(): Promise<void> {
-	const tab = await getActiveTab()
-	if (!tab?.url) return
-	await browser.tabs.create({ url: tab.url })
-}
