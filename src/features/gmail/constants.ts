@@ -13,7 +13,8 @@ export const GMAIL_SELECTORS = {
 export const GMAIL_SHORTCUTS = {
 	NEWER: "left, <",
 	OLDER: "right, >",
-	ACCOUNT_SWITCH: "1,2,3,4,5,6,7,8,9",
+	ACCOUNT_SWITCH:
+		"1,2,3,4,5,6,7,8,9,num_1,num_2,num_3,num_4,num_5,num_6,num_7,num_8,num_9",
 	INBOX: "0",
 	BACK_SEND: "enter",
 } as const

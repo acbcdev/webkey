@@ -28,7 +28,11 @@ export default defineContentScript({
 
 		// Switch to account by number (1-9)
 		hotkeys(GMAIL_SHORTCUTS.ACCOUNT_SWITCH, (event) => {
-			const numberPressed = parseInt(event.key, 10)
+			// Numpad keys: use event.code (Numpad1-Numpad9), works with NumLock on or off
+			const numpadMatch = /^Numpad([1-9])$/.exec(event.code ?? "")
+			const numberPressed = numpadMatch
+				? Number(numpadMatch[1])
+				: Number.parseInt(event.key, 10)
 			if (
 				numberPressed >= GMAIL_CONFIG.MIN_ACCOUNT &&
 				numberPressed <= GMAIL_CONFIG.MAX_ACCOUNT
