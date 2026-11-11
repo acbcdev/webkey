@@ -7,7 +7,7 @@ import { $ } from "@/lib/dom/query"
 import { toast } from "@/lib/ui/visual-feedback"
 
 export const PLATZI_CURSOS_SELECTORS = {
-	CONTENT: '[class*="Resources__summary"]',
+	CONTENT: '[class*="Resources__summary_"]', // ponytail: trailing _ skips __summaryAnchor wrapper (has "Resumen/Copiar" junk)
 	HEADING_H1: "h1",
 } as const
 
